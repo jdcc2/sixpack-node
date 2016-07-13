@@ -1,0 +1,19 @@
+{
+  "name": "sixpack-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdcc2/sixpack-node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jdcc2/sixpack-node/issues"
+  },
+  "homepage": "https://github.com/jdcc2/sixpack-node#readme"
+}
