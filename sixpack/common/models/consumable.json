@@ -1,0 +1,28 @@
+{
+  "name": "consumable",
+  "plural": "consumables",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "id": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "estimatedPrice": {
+      "type": "number",
+      "required": true,
+      "default": "0.0"
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
