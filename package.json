@@ -1,0 +1,28 @@
+{
+  "name": "sixpack-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "asyncawait": "^1.0.6",
+    "bcrypt": "^0.8.7",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "sequelize": "^3.23.6",
+    "sqlite3": "^3.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdcc2/sixpack-node.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jdcc2/sixpack-node/issues"
+  },
+  "homepage": "https://github.com/jdcc2/sixpack-node#readme"
+}
