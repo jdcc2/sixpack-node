@@ -13,6 +13,8 @@ module.exports = {
         })
     },
     post: function(req, res) {
+        //Don't allow choosing an ID, it is automagically assigned
+        delete req.body.id;
         models.User.create(req.body).then(function(user) {
             console.log("created user");
             console.log(user);

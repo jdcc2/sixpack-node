@@ -6,6 +6,8 @@ var sequelize = require('./database.js').sequelize
 var models = require('./models.js')
 var UserController = require('./controllers/UserController.js')
 var UsersController = require('./controllers/UsersController.js')
+var ConsumableController = require('./controllers/ConsumableController.js')
+var ConsumablesController = require('./controllers/ConsumablesController.js')
 console.log(UserController);
 var app = express();
 var router = express.Router()
@@ -17,6 +19,13 @@ router.delete('/users/:id', UserController.delete);
 //Users routers
 router.get('/users', UsersController.get);
 router.post('/users', UsersController.post);
+//Consumable routes
+router.get('/consumables/:id', ConsumableController.get);
+router.post('/consumables/:id', ConsumableController.post);
+router.delete('/consumables/:id', ConsumableController.delete);
+//Consumables routes
+router.get('/consumables', ConsumablesController.get);
+router.post('/consumables', ConsumablesController.post);
 
 //Middleware to parse JSON request bodies
 app.use(bodyParser.json());
@@ -37,16 +46,7 @@ sequelize.authenticate().then(function(err) {
   });
 
 //Sync all models here
-models.User.sync();
-// models.User.sync().then(function() {
-//     return models.User.create({
-//         name: 'PeterPan',
-//         email: 'ruk@mail.com',
-//         password: 'pw'
-//     }).then(function(user) {
-//         console.log(user);
-//     });
-// });
+sequelize.sync();
 
 
 app.listen(3000);
