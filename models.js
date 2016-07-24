@@ -9,6 +9,7 @@ var models = {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
+            allowNull: false,
             autoIncrement: true,
             validate: {
                 min: 0
@@ -125,8 +126,18 @@ var models = {
     }),
     Consumable: sequelize.define('consumable', {
         id: {
-            type: Sequelize.STRING,
+            type: Sequelize.INTEGER,
             primaryKey: true,
+            allowNull: false,
+            autoIncrement: true,
+            validate: {
+                min: 0
+            }
+        },
+        name: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            unique: true,
             validate: {
                 isAlpha: true
             }
@@ -147,6 +158,7 @@ var models = {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
+            allowNull: false,
             autoIncrement: true,
             validate: {
                 min: 0
