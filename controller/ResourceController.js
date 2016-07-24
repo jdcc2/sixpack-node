@@ -4,7 +4,6 @@ var Response = require('../response.js')
 var errors = require('../errors.js')
 var _ = require('underscore')
 
-//TODO merge ResourceController and MultiResourceController
 /*
 Params:
     returnExclude: array containing all fields that will not be returned in all request
@@ -21,24 +20,65 @@ function ResourceController(route, model, returnExclude, updateExclude) {
     this.updateExclude = updateExclude;
 }
 
-//Handles deletion of properties of single Instance objects based on the returnExclude list
-ResourceController.prototype.prepReturn = function(resource) {
+//Handles deletion of properties of Arrays of Sequelize Instance objects and single Instance objects based on the returnExclude list
+ResourceController.prototype.prepReturn = function(resources) {
     if(_.isArray(this.returnExclude)) {
         console.log('deleting parameters before return');
         _.each(this.returnExclude, function(propName) {
-            delete resource['dataValues'][propName]
+            if(_.isArray(resources)) {
+                _.each(resources, function(item, index) {
+                    delete resources[index]['dataValues'][propName];
+                });
+            } else {
+                delete resources['dataValues'][propName];
+            }
+
         });
     }
 }
 
-//Handles deletion of properties of single objects based on the updateExclude list
-ResourceController.prototype.prepUpdate = function(resource) {
+//Handles deletion of properties of Arrays of Objects and single Objects based on the updateExclude list
+ResourceController.prototype.prepUpdate = function(resources) {
     if(_.isArray(this.updateExclude)) {
         console.log('deleting parameters before update');
         _.each(this.updateExclude, function(propName) {
-            delete resource[propName]
+            if(_.isArray(resources)) {
+                _.each(resources, function(item, index) {
+                    delete resources[index][propName];
+                });
+            } else {
+                delete resources[propName];
+            }
+
         });
     }
+}
+
+ResourceController.prototype.getAll = function(req, res, next) {
+    var prepReturn = this.prepReturn.bind(this);
+    this.model.findAll().then(function(resources){
+        console.log('getting consumables');
+        console.log(this);
+        prepReturn(resources);
+        res.json(new Response(resources));
+    }).catch(function(err) {
+        next(err);
+    });
+
+}
+
+ResourceController.prototype.create = function(req, res, next) {
+    var prepReturn = this.prepReturn.bind(this);
+    this.prepUpdate(req.body);
+    this.model.create(req.body).then(function(resource) {
+        console.log("created resource");
+        prepReturn(resource);
+        res.json(new Response(resource));
+    }).catch(function(err) {
+        console.log('error creating resource');
+        console.log(err);
+        next(err);
+    });
 }
 
 

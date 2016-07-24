@@ -8,7 +8,6 @@ var _ = require('underscore')
 var models = require('./models.js')
 var errors = require('./errors.js')
 var controllers = require('./controllers.js')
-var MultiResourceController = require('./controller/MultiResourceController')
 var ResourceController = require('./controller/ResourceController')
 // var UserController = require('./controller/UserController.js')
 // var UsersController = require('./controller/UsersController.js')
@@ -23,9 +22,8 @@ _.each(controllers, function(controller) {
         router.get(`/${controller.route}/:id`, controller.get.bind(controller));
         router.post(`/${controller.route}/:id`, controller.post.bind(controller));
         router.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
-    } else if(controller instanceof MultiResourceController) {
-        router.get(`/${controller.route}`, controller.get.bind(controller));
-        router.post(`/${controller.route}`, controller.post.bind(controller));
+        router.get(`/${controller.route}`, controller.getAll.bind(controller));
+        router.post(`/${controller.route}`, controller.create.bind(controller));
     }
 });
 
