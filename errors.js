@@ -12,10 +12,19 @@ function LoginError(reason) {
     this.error = this.constructor.name;
     this.message = 'The login request failed'
     this.reason = reason
-    this.status = 404;
+    this.status = 200;
+}
+
+function AuthenticationError(reason) {
+    Error.captureStackTrace(this, this.constructor);
+    this.error = this.constructor.name;
+    this.message = 'Authentication required'
+    this.reason = reason
+    this.status = 401;
 }
 
 module.exports = {
     ResourceNotFoundError,
-    LoginError
+    LoginError,
+    AuthenticationError
 }

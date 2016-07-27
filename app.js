@@ -16,8 +16,9 @@ var controllers = require('./controllers.js')
 var ResourceController = require('./controller/ResourceController')
 var Response = require('./response.js')
 var app = express()
+//Router for all api routes
+var apiRouter = express.Router()
 var router = express.Router()
-
 
 //Configure JWT
 var jwtOptions = {
@@ -38,15 +39,36 @@ var jwtOptions = {
 
 var jwt = BPromise.promisifyAll(new JWT(jwtOptions));
 
+//Add authentication middleware to all api routes
+apiRouter.use(function(req, res, next){
+    if(req.headers.bearer) {
+        jwt.verifyAsync(req.headers.bearer).then(function(data){
+            return models.User.findOne({where: {id: data.claims.userId}});
+        }).then(function(user){
+            if(user) {
+                req.user = user;
+                next();
+            } else {
+                throw new errors.AuthenticationError('User not found');
+            }
+
+        }).catch(function(err){
+            next(err);
+        });
+    } else {
+        console.log('no bearer')
+        next(new errors.AuthenticationError('No JWT found in Bearer HTTP header'));
+    }
+});
 
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {
     if(controller instanceof ResourceController) {
-        router.get(`/${controller.route}/:id`, controller.get.bind(controller));
-        router.post(`/${controller.route}/:id`, controller.post.bind(controller));
-        router.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
-        router.get(`/${controller.route}`, controller.getAll.bind(controller));
-        router.post(`/${controller.route}`, controller.create.bind(controller));
+        apiRouter.get(`/${controller.route}/:id`, controller.get.bind(controller));
+        apiRouter.post(`/${controller.route}/:id`, controller.post.bind(controller));
+        apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
+        apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
+        apiRouter.post(`/${controller.route}`, controller.create.bind(controller));
     }
 });
 
@@ -63,7 +85,7 @@ router.post('/login', function(req, res, next) {
                             console.log('login success');
                             resolve(user);
                         } else {
-                            throw new LoginError('Email or password not valid');
+                            throw new errors.LoginError('Email or password not valid');
                         }
 
                     });
@@ -82,7 +104,7 @@ router.post('/login', function(req, res, next) {
             next(err);
         });
     } else {
-        throw new LoginError('Email or password not supplied in JSON format.');
+        throw new errors.LoginError('Email or password not supplied in JSON format.');
     }
 
 
@@ -100,6 +122,7 @@ router.all('*', function(res, req, next) {
 app.use(bodyParser.json());
 //Request logging
 app.use(morgan('combined'));
+app.use('/api', apiRouter)
 app.use('/', router);
 //Middleware to handle basic errors
 app.use(function(err, req, res, next) {
