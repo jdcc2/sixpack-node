@@ -1,7 +1,12 @@
 'use strict'
 
-var express = require('express');
-var bodyParser = require('body-parser');
+var express = require('express')
+var bodyParser = require('body-parser')
+var morgan = require('morgan')
+var bcrypt = require('bcrypt')
+var passport = require('passport')
+var BPromise = require('bluebird')
+var JWT = require('jwt-async')
 var sequelize = require('./database.js').sequelize
 var Sequelize = require('sequelize')
 var _ = require('underscore')
@@ -9,12 +14,30 @@ var models = require('./models.js')
 var errors = require('./errors.js')
 var controllers = require('./controllers.js')
 var ResourceController = require('./controller/ResourceController')
-// var UserController = require('./controller/UserController.js')
-// var UsersController = require('./controller/UsersController.js')
-// var ConsumableController = require('./controller/ConsumableController.js')
-// var ConsumablesController = require('./controller/ConsumablesController.js')
-var app = express();
+var Response = require('./response.js')
+var app = express()
 var router = express.Router()
+
+
+//Configure JWT
+var jwtOptions = {
+    crypto: {
+        algorithm: 'HS512',
+        secret: 'supersecret'
+    },
+    claims: {
+    // Automatically set 'Issued At' if true (epoch), or set to a number
+    iat: true,
+    // Set 'Not Before' claim (Unix epoch)
+    nbf: Math.floor(Date.now() / 1000) - 60,
+    // Set 'Expiration' claim (one day)
+    exp: Math.floor(Date.now() / 1000) + 3600,
+    issuer: 'sixpack'
+  }
+}
+
+var jwt = BPromise.promisifyAll(new JWT(jwtOptions));
+
 
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {
@@ -27,25 +50,56 @@ _.each(controllers, function(controller) {
     }
 });
 
-// //User routes
-// router.get('/users/:id', UserController.get);
-// router.post('/users/:id', UserController.post);
-// router.delete('/users/:id', UserController.delete);
-// //Users routers
-// router.get('/users', UsersController.get);
-// router.post('/users', UsersController.post);
-// //Consumable routes
-// router.get('/consumables/:id', ConsumableController.get.bind(ConsumableController));
-// router.post('/consumables/:id', ConsumableController.post.bind(ConsumableController));
-// router.delete('/consumables/:id', ConsumableController.delete.bind(ConsumableController));
-// //Consumables routes
-// router.get('/consumables', ConsumablesController.get.bind(ConsumablesController));
-// router.post('/consumables', ConsumablesController.post.bind(ConsumablesController));
+//Create the login and signup routes
+router.post('/login', function(req, res, next) {
+    if(req.body.email && req.body.password) {
+        //Find the user based on email
+        models.User.findOne({where: {email: req.body.email}}).then(function(user){
+            if(user) {
+                //Check the password
+                return new Promise(function(resolve, reject) {
+                    bcrypt.compare(req.body.password, user.password, function(err, res) {
+                        if(res) {
+                            console.log('login success');
+                            resolve(user);
+                        } else {
+                            throw new LoginError('Email or password not valid');
+                        }
+
+                    });
+                });
+
+            } else {
+                console.log('wrong user');
+                return null;
+            }
+        }).then(function(user){
+            return jwt.signAsync({userId: user.id});
+
+        }).then(function(signed) {
+            res.json(new Response({jwt: signed}));
+        }).catch(function(err){
+            next(err);
+        });
+    } else {
+        throw new LoginError('Email or password not supplied in JSON format.');
+    }
+
+
+});
+
+
 router.all('*', function(res, req, next) {
-    next(errors.ResourceNotFound('URL not found'));
+    next(new errors.ResourceNotFoundError('URL not found'));
 })
+
+
+//Passport middleware
+//app.use(passport.initialize());
 //Middleware to parse JSON request bodies
 app.use(bodyParser.json());
+//Request logging
+app.use(morgan('combined'));
 app.use('/', router);
 //Middleware to handle basic errors
 app.use(function(err, req, res, next) {

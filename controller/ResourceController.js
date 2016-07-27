@@ -30,6 +30,7 @@ ResourceController.prototype.prepReturn = function(resources) {
                     delete resources[index]['dataValues'][propName];
                 });
             } else {
+                console.log(typeof resources);
                 delete resources['dataValues'][propName];
             }
 
@@ -86,6 +87,8 @@ ResourceController.prototype.get = function(req, res, next) {
     var prepReturn = this.prepReturn.bind(this);
     this.model.findById(req.params.id).then(function(resource){
         if(resource) {
+            console.log('get')
+            console.log(resource);
             prepReturn(resource);
             res.json(new Response(resource));
         } else {
@@ -109,7 +112,7 @@ ResourceController.prototype.post = function(req, res, next) {
             console.log('updating resource');
             return resource.update(req.body);
         } else {
-            next(new errors.ResourceNotFoundError());
+            throw new errors.ResourceNotFoundError();
         }
 
     }).then(function(resource) {
