@@ -72,6 +72,8 @@ _.each(controllers, function(controller) {
     }
 });
 
+
+
 //Create the login and signup routes
 router.post('/login', function(req, res, next) {
     if(req.body.email && req.body.password) {
@@ -132,12 +134,16 @@ app.use(function(err, req, res, next) {
         res.status(400);
         res.json({ok: false, error: "ValidationError", errorMessage: err.message});
         handled = true;
-    } else{
+    } else if(err instanceof JWT.JWTValidationError) {
+        res.status(401);
+        res.json({ok: false, error: "JWTValidationError", errorMessage: "JWT token is invalid or expired"});
+        handled = true;
+    } else {
         //Loop over each type of custom error and check if that's the one
         _.each(errors, function(errorClass) {
             if(err instanceof errorClass) {
                 res.status(err.status);
-                res.json({ok: false, error: err.error, errorMessage: err.message});
+                res.json({ok: false, error: err.error, errorMessage: err.message, reason: err.reason});
                 handled = true;
             }
         });
@@ -165,5 +171,10 @@ sequelize.authenticate().then(function(err) {
 //Sync all models here
 sequelize.sync();
 
+//TODO fix this
+models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com', password: 'admin'}}).catch(function(err) {
+    console.log('Error creating admin');
+    console.log(err);
+});
 
 app.listen(3000);

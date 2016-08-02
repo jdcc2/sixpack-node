@@ -1,8 +1,6 @@
 var sequelize = require('./database.js').sequelize;
 var Sequelize = require('sequelize');
 var bcrypt = require('bcrypt');
-var async = require('asyncawait/async')
-var await = require('asyncawait/await')
 
 var models = {
     User : sequelize.define('user', {
@@ -189,6 +187,36 @@ var models = {
             allowNull: false,
             defaultValue: false
         }
+    }),
+    Role: sequelize.define('role', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+            autoIncrement: true,
+            validate: {
+                min: 0
+            }
+        },
+        name: {
+            type: Sequelize.STRING,
+            allowNull: false,
+            unique: true,
+            validate: {
+                isAlpha: true
+            }
+        }
+    }),
+    UserRole: sequelize.define('userrole', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+            autoIncrement: true,
+            validate: {
+                min: 0
+            }
+        }
     })
 }
 
@@ -197,6 +225,9 @@ models.Consumption.belongsTo(models.User, {onDelete: 'NO ACTION'});
 models.Consumption.belongsTo(models.Consumable, {onDelete: 'NO ACTION'});
 models.User.hasMany(models.Consumption);
 models.Consumable.hasMany(models.Consumption);
-
+models.User.hasMany(models.UserRole);
+models.UserRole.belongsTo(models.User);
+models.UserRole.belongsTo(models.Role);
+models.Role.hasMany(models.UserRole);
 
 module.exports = models;
