@@ -39,6 +39,8 @@ var jwtOptions = {
 
 var jwt = BPromise.promisifyAll(new JWT(jwtOptions));
 
+var userSessions = {};
+
 //Add authentication middleware to all api routes
 apiRouter.use(function(req, res, next){
     if(req.headers.bearer) {
@@ -77,6 +79,7 @@ _.each(controllers, function(controller) {
 //Create the login and signup routes
 router.post('/login', function(req, res, next) {
     if(req.body.email && req.body.password) {
+        var uid = null;
         //Find the user based on email
         models.User.findOne({where: {email: req.body.email}}).then(function(user){
             if(user) {
@@ -98,9 +101,18 @@ router.post('/login', function(req, res, next) {
                 return null;
             }
         }).then(function(user){
+            uid = user.id;
             return jwt.signAsync({userId: user.id});
 
         }).then(function(signed) {
+            console.log('uid')
+            console.log(uid)
+            if (userSessions.hasOwnProperty(uid)) {
+                userSessions[uid].push(signed);
+            } else {
+                userSessions[uid] = [signed];
+            }
+            console.log(userSessions);
             res.json(new Response({jwt: signed}));
         }).catch(function(err){
             next(err);
