@@ -226,8 +226,8 @@ models.Consumption.belongsTo(models.Consumable, {onDelete: 'NO ACTION'});
 models.User.hasMany(models.Consumption);
 models.Consumable.hasMany(models.Consumption);
 models.User.hasMany(models.UserRole);
-models.UserRole.belongsTo(models.User);
-models.UserRole.belongsTo(models.Role);
+models.UserRole.belongsTo(models.User, {onDelete: 'CASCADE'});
+models.UserRole.belongsTo(models.Role, {onDelete: 'NO ACTION'});
 models.Role.hasMany(models.UserRole);
 
 module.exports = models;

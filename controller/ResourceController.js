@@ -10,14 +10,17 @@ Params:
     updateExclude: all fields that are not allowed to be updated (ID fields are not allowed to be updated by Sequelize)
     route: api route will become: /<route>/:id
     model: Sequelize model instance used to fetch data
+    acl: { <rolename> : { read: <true/false>, write: <true/false>}}
 */
-function ResourceController(route, model, returnExclude, updateExclude) {
+function ResourceController(route, model, returnExclude, updateExclude, readRoles, writeRoles) {
 
     //TODO maybe check argument types, regard it as a breach of contract for now
     this.route = route;
     this.model = model;
     this.returnExclude = returnExclude;
     this.updateExclude = updateExclude;
+    this.readRoles = readRoles;
+    this.writeRoles = writeRoles;
 }
 
 //Handles deletion of properties of Arrays of Sequelize Instance objects and single Instance objects based on the returnExclude list
@@ -55,9 +58,36 @@ ResourceController.prototype.prepUpdate = function(resources) {
     }
 }
 
+ResourceController.prototype.fetchResource = function(req, res, next) {
+    if(req.params.id) {
+        this.model.findById(req.params.id).then(function(resource){
+            if(resource) {
+                console.log('fetchResource')
+                console.log(resource);
+                req.resource = resource;
+                next();
+            } else {
+                next(new errors.ResourceNotFoundError());
+            }
+        }).catch(function(err) {
+            next(err);
+        });
+    } else {
+        this.model.findAll().then(function(resources){
+            console.log('getting consumables');
+            console.log(this);
+            req.resource = resources;
+            next();
+
+        }).catch(function(err) {
+            next(err);
+        });
+    }
+}
+
 ResourceController.prototype.getAll = function(req, res, next) {
     var prepReturn = this.prepReturn.bind(this);
-    this.model.findAll().then(function(resources){
+    this.model.findAll({ include: [{ all: true, nested: true }]}).then(function(resources){
         console.log('getting consumables');
         console.log(this);
         prepReturn(resources);
@@ -85,7 +115,7 @@ ResourceController.prototype.create = function(req, res, next) {
 
 ResourceController.prototype.get = function(req, res, next) {
     var prepReturn = this.prepReturn.bind(this);
-    this.model.findById(req.params.id).then(function(resource){
+    this.model.findById(req.params.id, { include: [{ all: true, nested: true }]}).then(function(resource){
         if(resource) {
             console.log('get')
             console.log(resource);
@@ -131,6 +161,30 @@ ResourceController.prototype.delete = function(req, res, next) {
     }).catch(function(err) {
         next(err);
     });
+}
+
+ResourceController.prototype.authorizeRead = function(req, res, next){
+    var hasRole = false;
+    //Loop over the user roles and check if it matches on of allowed roles
+    _.each(req.user.userroles, function(userrole) {
+        console.log(`allowed roles: ${this.readRoles}`);
+        if(_.contains(this.readRoles, userrole.role.name)) {
+            console.log('role found');
+            hasRole = true;
+        }
+    }, this);
+    var isOwner = false;
+    //If the user has no role granting access, check if the user has the impicit owner role
+    if(_.contains(this.readRoles, '$owner') && req.params.id) {
+        console.log('checking if owner');
+        this.model.count({where: ['userId = ?', req.user.id, 'id = ?', req.params.id]}).then(function(c) {
+            if(c === 1) {
+                console.log('isOwner');
+                isOwner = true;
+            }
+        });
+    }
+    next();
 }
 
 

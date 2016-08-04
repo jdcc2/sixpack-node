@@ -45,7 +45,13 @@ var userSessions = {};
 apiRouter.use(function(req, res, next){
     if(req.headers.bearer) {
         jwt.verifyAsync(req.headers.bearer).then(function(data){
-            return models.User.findOne({where: {id: data.claims.userId}});
+            return models.User.findOne({where: {id: data.claims.userId},
+                include: [{ model: models.UserRole,
+                            include: [
+                                {model: models.Role}
+                            ]
+
+            }]});
         }).then(function(user){
             if(user) {
                 req.user = user;
@@ -66,7 +72,7 @@ apiRouter.use(function(req, res, next){
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {
     if(controller instanceof ResourceController) {
-        apiRouter.get(`/${controller.route}/:id`, controller.get.bind(controller));
+        apiRouter.get(`/${controller.route}/:id`, controller.authorizeRead.bind(controller), controller.get.bind(controller));
         apiRouter.post(`/${controller.route}/:id`, controller.post.bind(controller));
         apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
         apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
@@ -184,7 +190,7 @@ sequelize.authenticate().then(function(err) {
 sequelize.sync();
 
 //TODO fix this
-models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com', password: 'admin'}}).catch(function(err) {
+models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'}, defaults: { password: 'admin'}}).catch(function(err) {
     console.log('Error creating admin');
     console.log(err);
 });
