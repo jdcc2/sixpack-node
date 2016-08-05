@@ -5,8 +5,8 @@ var models = require('./models.js')
 
 module.exports = {
     ConsumableController: new ResourceController('consumables', models.Consumable),
-    UserController: new ResourceController('users', models.User, ['password']),
+    UserController: new ResourceController('users', models.User, {returnExclude: ['password']}),
     ConsumptionController: new ResourceController('consumptions', models.Consumption),
     RoleController: new ResourceController('roles', models.Role),
-    UserRoleController: new ResourceController('userroles', models.UserRole)
+    UserRoleController: new ResourceController('userroles', models.UserRole, {acl: {get: ['$owner']}})
 }

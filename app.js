@@ -72,7 +72,7 @@ apiRouter.use(function(req, res, next){
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {
     if(controller instanceof ResourceController) {
-        apiRouter.get(`/${controller.route}/:id`, controller.authorizeRead.bind(controller), controller.get.bind(controller));
+        apiRouter.get(`/${controller.route}/:id`, controller.get.bind(controller));
         apiRouter.post(`/${controller.route}/:id`, controller.post.bind(controller));
         apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
         apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
@@ -179,20 +179,24 @@ app.use(function(err, req, res, next) {
 
 });
 
-sequelize.authenticate().then(function(err) {
+sequelize.authenticate().then(function() {
     console.log('Database connection has been established successfully.');
-  })
-  .catch(function (err) {
-    console.log('Unable to connect to the database:', err);
-  });
-
-//Sync all models here
-sequelize.sync();
-
-//TODO fix this
-models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'}, defaults: { password: 'admin'}}).catch(function(err) {
-    console.log('Error creating admin');
+    //Sync all models
+    return sequelize.sync();
+}).then(function() {
+    //Create the admin role if it does not exist
+    console.log('Creating admin role...');
+    return models.Role.findOrCreate({where: {id: "sixpackadmin"}});
+}).then(function() {
+    //make sure the admin account exists
+    console.log('Creating admin account...')
+    return models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'}, defaults: { password: 'admin', userroles: [{userId: 1, roleId: 'sixpackadmin'}]}, include: [models.UserRole]});
+}).catch(function(err) {
+    console.log('Error accessing database');
     console.log(err);
 });
+
+
+
 
 app.listen(3000);

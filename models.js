@@ -189,18 +189,19 @@ var models = {
         }
     }),
     Role: sequelize.define('role', {
+        // id: {
+        //     type: Sequelize.INTEGER,
+        //     primaryKey: true,
+        //     allowNull: false,
+        //     autoIncrement: true,
+        //     validate: {
+        //         min: 0
+        //     }
+        // },
         id: {
-            type: Sequelize.INTEGER,
-            primaryKey: true,
-            allowNull: false,
-            autoIncrement: true,
-            validate: {
-                min: 0
-            }
-        },
-        name: {
             type: Sequelize.STRING,
             allowNull: false,
+            primaryKey: true,
             unique: true,
             validate: {
                 isAlpha: true
@@ -226,6 +227,7 @@ models.Consumption.belongsTo(models.Consumable, {onDelete: 'NO ACTION'});
 models.User.hasMany(models.Consumption);
 models.Consumable.hasMany(models.Consumption);
 models.User.hasMany(models.UserRole);
+//The composite unique constraint on userId and roleId is missing
 models.UserRole.belongsTo(models.User, {onDelete: 'CASCADE'});
 models.UserRole.belongsTo(models.Role, {onDelete: 'NO ACTION'});
 models.Role.hasMany(models.UserRole);
