@@ -1,6 +1,7 @@
 'use strict'
 
 var ResourceController = require('./controller/ResourceController.js')
+var UserController = require('./controller/UserController')
 var models = require('./models.js')
 
 module.exports = {

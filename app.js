@@ -1,73 +1,32 @@
 'use strict'
 
 var express = require('express')
+var expressSession = require('express-session')
 var bodyParser = require('body-parser')
 var morgan = require('morgan')
-var bcrypt = require('bcrypt')
 var passport = require('passport')
-var BPromise = require('bluebird')
-var JWT = require('jwt-async')
 var sequelize = require('./database.js').sequelize
 var Sequelize = require('sequelize')
+var helmet = require('helmet')
+var JWT = require('jwt-async')
 var _ = require('underscore')
 var models = require('./models.js')
 var errors = require('./errors.js')
 var controllers = require('./controllers.js')
+var config = require('./config.js')
 var ResourceController = require('./controller/ResourceController')
+var UserController = require('./controller/UserController')
 var Response = require('./response.js')
+var auth = require('./auth.js')
+
 var app = express()
 //Router for all api routes
 var apiRouter = express.Router()
 var router = express.Router()
 
-//Configure JWT
-var jwtOptions = {
-    crypto: {
-        algorithm: 'HS512',
-        secret: 'supersecret'
-    },
-    claims: {
-    // Automatically set 'Issued At' if true (epoch), or set to a number
-    iat: true,
-    // Set 'Not Before' claim (Unix epoch)
-    nbf: Math.floor(Date.now() / 1000) - 60,
-    // Set 'Expiration' claim (one day)
-    exp: Math.floor(Date.now() / 1000) + 3600,
-    issuer: 'sixpack'
-  }
-}
-
-var jwt = BPromise.promisifyAll(new JWT(jwtOptions));
-
-var userSessions = {};
 
 //Add authentication middleware to all api routes
-apiRouter.use(function(req, res, next){
-    if(req.headers.bearer) {
-        jwt.verifyAsync(req.headers.bearer).then(function(data){
-            return models.User.findOne({where: {id: data.claims.userId},
-                include: [{ model: models.UserRole,
-                            include: [
-                                {model: models.Role}
-                            ]
-
-            }]});
-        }).then(function(user){
-            if(user) {
-                req.user = user;
-                next();
-            } else {
-                throw new errors.AuthenticationError('User not found');
-            }
-
-        }).catch(function(err){
-            next(err);
-        });
-    } else {
-        console.log('no bearer')
-        next(new errors.AuthenticationError('No JWT found in Bearer HTTP header'));
-    }
-});
+apiRouter.use(auth.authJWT);
 
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {
@@ -77,59 +36,14 @@ _.each(controllers, function(controller) {
         apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
         apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
         apiRouter.post(`/${controller.route}`, controller.create.bind(controller));
+    } else if(controller instanceof UserController) {
+        apiRouter.get(`/${controller.route}/:id`, controller.get.bind(controller));
+        apiRouter.post(`/${controller.route}/:id`, controller.post.bind(controller));
+        apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
+        apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
+        apiRouter.post(`/${controller.route}`, controller.create.bind(controller));
     }
 });
-
-
-
-//Create the login and signup routes
-router.post('/login', function(req, res, next) {
-    if(req.body.email && req.body.password) {
-        var uid = null;
-        //Find the user based on email
-        models.User.findOne({where: {email: req.body.email}}).then(function(user){
-            if(user) {
-                //Check the password
-                return new Promise(function(resolve, reject) {
-                    bcrypt.compare(req.body.password, user.password, function(err, res) {
-                        if(res) {
-                            console.log('login success');
-                            resolve(user);
-                        } else {
-                            throw new errors.LoginError('Email or password not valid');
-                        }
-
-                    });
-                });
-
-            } else {
-                console.log('wrong user');
-                return null;
-            }
-        }).then(function(user){
-            uid = user.id;
-            return jwt.signAsync({userId: user.id});
-
-        }).then(function(signed) {
-            console.log('uid')
-            console.log(uid)
-            if (userSessions.hasOwnProperty(uid)) {
-                userSessions[uid].push(signed);
-            } else {
-                userSessions[uid] = [signed];
-            }
-            console.log(userSessions);
-            res.json(new Response({jwt: signed}));
-        }).catch(function(err){
-            next(err);
-        });
-    } else {
-        throw new errors.LoginError('Email or password not supplied in JSON format.');
-    }
-
-
-});
-
 
 router.all('*', function(res, req, next) {
     next(new errors.ResourceNotFoundError('URL not found'));
@@ -142,8 +56,22 @@ router.all('*', function(res, req, next) {
 app.use(bodyParser.json());
 //Request logging
 app.use(morgan('combined'));
+//Helmet
+app.use(helmet.frameguard());
+app.use(helmet.noCache());
+app.use(helmet.dnsPrefetchControl())
+
+//Passport
+app.use(expressSession({'secret' : config.jwtOptions.crypto.secret, name: 'sessionId'}))
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(morgan('dev'));
+//Routers
 app.use('/api', apiRouter)
+app.use('/auth', auth.authRouter)
 app.use('/', router);
+
+
 //Middleware to handle basic errors
 app.use(function(err, req, res, next) {
     var handled = false;
