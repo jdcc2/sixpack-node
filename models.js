@@ -17,12 +17,8 @@ var models = {
             type: Sequelize.STRING,
             allowNull: false,
             validate: {
-                isAlpha: true
+                is: /^[a-z0-9][a-z0-9 ]+$/i
             }
-        },
-        password: {
-            type: Sequelize.STRING,
-            allowNull: false,
         },
         email: {
             type: Sequelize.STRING,
@@ -48,8 +44,21 @@ var models = {
             allowNull: false,
             defaultValue: false,
         }
-
-
+    }),
+    LocalProfile: sequelize.define('localprofile', {
+        id: {
+            type: Sequelize.INTEGER,
+            primaryKey: true,
+            allowNull: false,
+            autoIncrement: true,
+            validate: {
+                min: 0
+            }
+        },
+        password: {
+            type: Sequelize.STRING,
+            allowNull: false,
+        }
     }, {
         hooks: {
             beforeCreate: function(user) {
@@ -218,6 +227,28 @@ var models = {
                 min: 0
             }
         }
+    }),
+    GoogleProfile: sequelize.define('googleprofile', {
+        id: {
+            type: Sequelize.STRING,
+            primaryKey: true,
+            allowNull: false
+        },
+        token : {
+            type: Sequelize.STRING,
+            allowNull: false
+        }
+    }),
+    APIToken: sequelize.define('apitoken', {
+        jwt: {
+            type: Sequelize.STRING,
+            primaryKey: true,
+            allowNull: false
+        },
+        expires: {
+            type: Sequelize.DATE,
+            allowNull: true
+        }
     })
 }
 
@@ -227,9 +258,18 @@ models.Consumption.belongsTo(models.Consumable, {onDelete: 'NO ACTION'});
 models.User.hasMany(models.Consumption);
 models.Consumable.hasMany(models.Consumption);
 models.User.hasMany(models.UserRole);
+//APITokens and users
+models.User.hasMany(models.APIToken);
+models.APIToken.belongsTo(models.User, {onDelete: 'CASCADE'});
 //The composite unique constraint on userId and roleId is missing
 models.UserRole.belongsTo(models.User, {onDelete: 'CASCADE'});
 models.UserRole.belongsTo(models.Role, {onDelete: 'NO ACTION'});
 models.Role.hasMany(models.UserRole);
+//Authentication profiles
+models.User.hasOne(models.LocalProfile, {onDelete: 'NO ACTION'});
+models.User.hasOne(models.GoogleProfile, {onDelete: 'NO ACTION'});
+models.LocalProfile.belongsTo(models.User, {onDelete: 'CASCADE'});
+models.GoogleProfile.belongsTo(models.User,{onDelete: 'CASCADE'});
+
 
 module.exports = models;

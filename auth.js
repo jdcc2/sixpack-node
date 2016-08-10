@@ -9,6 +9,7 @@ var JWT = require('jwt-async')
 var BPromise = require('bluebird')
 var passport = require('passport')
 var LocalStrategy = require('passport-local')
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 var bodyParser = require('body-parser')
 var bcrypt = require('bcrypt')
 var Response = require('./response.js')
@@ -18,29 +19,48 @@ var authRouter = express.Router()
 var userSessions = {};
 
 function authJWT(req, res, next){
+    var data = null;
     if(req.headers.bearer) {
         jwt.verifyAsync(req.headers.bearer).then(function(data){
+            data = data;
             return models.User.findOne({where: {id: data.claims.userId},
-                include: [{ model: models.UserRole,
+                include: [models.APIToken]});
+        }).then(function(user){
+            console.log(user.apitokens);
+            if(user) {
+                return models.APIToken.findOne({where: {jwt: req.headers.bearer}, include: [{model: models.User, include: [{ model: models.UserRole,
                             include: [
                                 {model: models.Role}
                             ]
 
-            }]});
-        }).then(function(user){
-            if(user) {
-                req.user = user;
-                next();
+            }]}]});
             } else {
                 throw new errors.AuthenticationError('User not found');
             }
 
+        }).then(function(apitoken) {
+            //TODO check the expiry date
+            if(apitoken) {
+                req.user = apitoken.user;
+                next();
+            } else {
+                throw new errors.AuthenticationError('Invalid JWT token supplied');
+            }
+
+
         }).catch(function(err){
             next(err);
         });
+    }
+}
+
+function authCheck(req, res, next) {
+    console.log("Cheking if user authenticated...")
+    if(req.user) {
+        next();
     } else {
-        console.log('no bearer')
-        next(new errors.AuthenticationError('No JWT found in Bearer HTTP header'));
+        res.redirect('/auth/login')
+        //throw new errors.AuthenticationError('Authentication required');
     }
 }
 
@@ -49,11 +69,11 @@ authRouter.post('/apilogin', function(req, res, next) {
     if(req.body.email && req.body.password) {
         var uid = null;
         //Find the user based on email
-        models.User.findOne({where: {email: req.body.email}}).then(function(user){
-            if(user) {
+        models.User.findOne({where: {email: req.body.email}, include: [{ model: models.LocalProfile}]}).then(function(user){
+            if(user && user.localprofile) {
                 //Check the password
                 return new Promise(function(resolve, reject) {
-                    bcrypt.compare(req.body.password, user.password, function(err, res) {
+                    bcrypt.compare(req.body.password, user.localprofile.password, function(err, res) {
                         if(res) {
                             console.log('login success');
                             resolve(user);
@@ -75,13 +95,9 @@ authRouter.post('/apilogin', function(req, res, next) {
         }).then(function(signed) {
             console.log('uid')
             console.log(uid)
-            if (userSessions.hasOwnProperty(uid)) {
-                userSessions[uid].push(signed);
-            } else {
-                userSessions[uid] = [signed];
-            }
-            console.log(userSessions);
-            res.json(new Response({jwt: signed}));
+            return models.APIToken.create({jwt: signed, userId: uid, expires: req.params.expires ? new Date(expires) : null});
+        }).then(function(apitoken) {
+            res.json(new Response({jwt: apitoken.jwt}));
         }).catch(function(err){
             next(err);
         });
@@ -92,15 +108,14 @@ authRouter.post('/apilogin', function(req, res, next) {
 
 });
 
-passport.use('local', new LocalStrategy(function(username, password, done) {
+passport.use('local', new LocalStrategy({usernameField: 'email'}, function(username, password, done) {
     process.nextTick(function() {
-        console.log('whaza')
-        models.User.findOne({where: {email: username}}).then(function(user){
-            console.log('whut')
-            if(user) {
+        console.log('Authenticating using local strategy');
+        models.User.findOne({where: {email: username}, include: [{ model: models.LocalProfile}]}).then(function(user){
+            if(user && user.localprofile) {
                 //Check the password
                 return new Promise(function(resolve, reject) {
-                    bcrypt.compare(password, user.password, function(err, res) {
+                    bcrypt.compare(password, user.localprofile.password, function(err, res) {
                         if(res) {
                             console.log('login success');
                             resolve(user);
@@ -128,16 +143,73 @@ passport.use('local', new LocalStrategy(function(username, password, done) {
 
 }));
 
+
+passport.use('google', new GoogleStrategy(config.googleAuth,
+    function(token, refreshToken, profile, done) {
+        console.log('Google profile')
+        console.log(profile);
+        // make the code asynchronous
+        // User.findOne won't fire until we have all our data back from Google
+        process.nextTick(function() {
+            console.log('Authenticating using google strategy')
+            // try to find the user based on their google id
+            models.GoogleProfile.findOne({where: {id: profile.id}, include: [{ model: models.User }]}).then(function(gp) {
+                if(gp) {
+                    console.log('GP user')
+                    console.log(gp.user);
+                    return done(null, gp.user);
+                } else {
+                    models.User.create({email: profile.emails[0].value,
+                                        name: profile.displayName,
+                                        googleprofile: {
+                                            id: profile.id,
+                                            token: token
+                                        }
+                                    },
+                                    {
+                                        include: [models.GoogleProfile]
+                                    }).then(function(user) {
+                                        return done(null, user);
+                                    });
+                }
+            });
+        });
+
+    }));
+
+
 passport.serializeUser(function(user, done) {
     done(null, user.id);
 });
 
 passport.deserializeUser(function(id, done) {
-    models.User.findById(id).then(function(user) {
+    models.User.findById(id, {include: [{ model: models.UserRole,
+                include: [
+                    {model: models.Role}
+                ]
+
+}]}).then(function(user) {
         done(null, user);
     }).catch(function(err){
         done(err, null);
     });
+});
+
+authRouter.get('/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
+authRouter.get('/googlecb',
+            passport.authenticate('google', {
+                    successRedirect : '/',
+                    failureRedirect : '/auth/login'
+            }));
+
+
+authRouter.get('/login', function(req,res) {
+    res.render('login.ejs');
+});
+
+authRouter.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/auth/login');
 });
 
 authRouter.post('/login', bodyParser(), passport.authenticate('local', { successRedirect: '/', failureRedirect: '/auth/login' }));
@@ -146,5 +218,6 @@ authRouter.post('/login', bodyParser(), passport.authenticate('local', { success
 module.exports = {
     authJWT,
     authRouter,
-    passport
+    passport,
+    authCheck
 }

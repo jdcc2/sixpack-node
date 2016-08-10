@@ -95,6 +95,7 @@ ResourceController.prototype.create = function(req, res, next) {
 ResourceController.prototype.get = function(req, res, next) {
     var model = this.model;
     var prepReturn = this.prepReturn.bind(this);
+
     this.authorize('get', req.user, req.params.id).then(function() {
         return model.findById(req.params.id, { include: [{ all: true, nested: true }]});
     }).then(function(resource){
@@ -205,6 +206,7 @@ ResourceController.prototype.authorizeRead = function(req, res, next){
 //the return value is a promise which will reject with an AuthorizationError if authorization fails
 ResourceController.prototype.authorize = function(httpMethod, user, resourceId){
     console.log('authorize');
+    console.log(user.userroles);
     var model = this.model;
     var hasRole = false;
     var isOwner = false;
@@ -229,7 +231,9 @@ ResourceController.prototype.authorize = function(httpMethod, user, resourceId){
             }
         }, this);
     }
-
+    console.log(`hasRole?: ${hasRole}`);
+    console.log(`isOwner?: ${isOwner}`);
+    console.log(`result: ${isOwner || hasRole}`);
     //Checking ownership
     //Checking for ownership if specified in ACL (and needed/possible)
     if(this.options.acl && ((_.isArray(this.options.acl['all']) && _.contains(this.options.acl['all'], '$owner')) || (_.isArray(this.options.acl[httpMethod]) && _.contains(this.options.acl[httpMethod], '$owner'))) && resourceId && !hasRole) {
@@ -261,7 +265,7 @@ ResourceController.prototype.authorize = function(httpMethod, user, resourceId){
         //Return false if not authorized
         console.log(`hasRole?: ${hasRole}`);
         console.log(`isOwner?: ${isOwner}`);
-        return (hasRole || isOwner) ? Promise.resolve(): Promise.reject();
+        return (hasRole || isOwner) ? Promise.resolve(): Promise.reject(new errors.AuthorizationError("Not Authorized"));
     }
 
 }

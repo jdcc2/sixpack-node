@@ -27,6 +27,7 @@ var router = express.Router()
 
 //Add authentication middleware to all api routes
 apiRouter.use(auth.authJWT);
+apiRouter.use(auth.authCheck);
 
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {
@@ -45,13 +46,21 @@ _.each(controllers, function(controller) {
     }
 });
 
+//Protect the root router from unauthenticated requests
+router.use(auth.authCheck);
+router.get('/', function(req, res) {
+    res.render('index.ejs');
+});
 router.all('*', function(res, req, next) {
     next(new errors.ResourceNotFoundError('URL not found'));
 })
 
 
-//Passport middleware
-//app.use(passport.initialize());
+
+//Set the template engine
+app.set('view engine', 'ejs');
+app.set('views', './views');
+
 //Middleware to parse JSON request bodies
 app.use(bodyParser.json());
 //Request logging
@@ -66,10 +75,15 @@ app.use(expressSession({'secret' : config.jwtOptions.crypto.secret, name: 'sessi
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(morgan('dev'));
+
+//Serve static filesi in 'static' dir under '/static'
+app.use('/static', express.static('static'))
+
 //Routers
 app.use('/api', apiRouter)
 app.use('/auth', auth.authRouter)
-app.use('/', router);
+app.use('/', router); //This one should be specified last because it contains a catch-all route
+
 
 
 //Middleware to handle basic errors
@@ -118,7 +132,7 @@ sequelize.authenticate().then(function() {
 }).then(function() {
     //make sure the admin account exists
     console.log('Creating admin account...')
-    return models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'}, defaults: { password: 'admin', userroles: [{userId: 1, roleId: 'sixpackadmin'}]}, include: [models.UserRole]});
+    return models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'}, defaults: { userroles: [{userId: 1, roleId: 'sixpackadmin'}], localprofile: {password: 'admin'}}, include: [models.UserRole, models.LocalProfile]});
 }).catch(function(err) {
     console.log('Error accessing database');
     console.log(err);
