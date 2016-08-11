@@ -16,6 +16,7 @@ var controllers = require('./controllers.js')
 var config = require('./config.js')
 var ResourceController = require('./controller/ResourceController')
 var UserController = require('./controller/UserController')
+var APITokenController = require('./controller/APITokenController')
 var Response = require('./response.js')
 var auth = require('./auth.js')
 
@@ -41,8 +42,16 @@ _.each(controllers, function(controller) {
         apiRouter.get(`/${controller.route}/:id`, controller.get.bind(controller));
         apiRouter.post(`/${controller.route}/:id`, controller.post.bind(controller));
         apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
+        //NOT '/users/current' does not work as it is mathced by :id in the previous routers
+        apiRouter.get('/currentuser', controller.getCurrent.bind(controller));
         apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
         apiRouter.post(`/${controller.route}`, controller.create.bind(controller));
+
+    } else if(controller instanceof APITokenController) {
+        apiRouter.get(`/${controller.route}/:id`, controller.get.bind(controller));
+        apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
+        apiRouter.post(`/${controller.route}`, controller.create.bind(controller));
+        apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
     }
 });
 
@@ -129,6 +138,9 @@ sequelize.authenticate().then(function() {
     //Create the admin role if it does not exist
     console.log('Creating admin role...');
     return models.Role.findOrCreate({where: {id: "sixpackadmin"}});
+}).then(function() {
+    console.log('Creating beeradmin role...');
+    return models.Role.findOrCreate({where: {id: "beeradmin"}});
 }).then(function() {
     //make sure the admin account exists
     console.log('Creating admin account...')

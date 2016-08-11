@@ -57,10 +57,6 @@
 	
 	var _vue2 = _interopRequireDefault(_vue);
 	
-	var _App = __webpack_require__(4);
-	
-	var _App2 = _interopRequireDefault(_App);
-	
 	var _bulma = __webpack_require__(6);
 	
 	var _bulma2 = _interopRequireDefault(_bulma);
@@ -73,20 +69,29 @@
 	
 	var _vuex2 = _interopRequireDefault(_vuex);
 	
+	var _App = __webpack_require__(4);
+	
+	var _App2 = _interopRequireDefault(_App);
+	
+	var _UserManager = __webpack_require__(12);
+	
+	var _UserManager2 = _interopRequireDefault(_UserManager);
+	
+	var _AdminDashboard = __webpack_require__(14);
+	
+	var _AdminDashboard2 = _interopRequireDefault(_AdminDashboard);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	_vue2.default.use(_vueRouter2.default);
 	
 	var router = new _vueRouter2.default();
 	
-	// router.map({
-	//    '/login' : {
-	//        component: Login
-	//    },
-	//    '/users' : {
-	//        component: UserManager
-	//    }
-	// });
+	router.map({
+	   '/admin': {
+	      component: _AdminDashboard2.default
+	   }
+	});
 	
 	//First argument is a Vue component constructor, second part a css selector to mount in
 	router.start(_App2.default, 'app');
@@ -10364,7 +10369,7 @@
 /* 5 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\n<h1>Sixpack App 2.0</h1>\n<router-view></router-view>\n\n\n";
+	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left nav-menu\">\n            <a class=\"nav-item is-tab\" href=\"/#\">Home</a>\n            <a class=\"nav-item is-tab\" v-link=\"{path: 'admin'}\">Admin</a>\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
 
 /***/ },
 /* 6 */
@@ -14066,6 +14071,64 @@
 	  return index;
 	
 	}));
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_template__ = __webpack_require__(13)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-d906e680/UserManager.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	module.exports = "\n\n\n";
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_template__ = __webpack_require__(15)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-afaf1ed2/AdminDashboard.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<h1>Admin Dashboard</h1>\n";
 
 /***/ }
 /******/ ]);

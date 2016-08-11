@@ -65,7 +65,6 @@ ResourceController.prototype.getAll = function(req, res, next) {
         return model.findAll({ include: [{ all: true, nested: true }]});
     }).then(function(resources){
         console.log('getting consumables');
-        console.log(this);
         prepReturn(resources);
         res.json(new Response(resources));
     }).catch(function(err) {
@@ -206,7 +205,6 @@ ResourceController.prototype.authorizeRead = function(req, res, next){
 //the return value is a promise which will reject with an AuthorizationError if authorization fails
 ResourceController.prototype.authorize = function(httpMethod, user, resourceId){
     console.log('authorize');
-    console.log(user.userroles);
     var model = this.model;
     var hasRole = false;
     var isOwner = false;
@@ -221,7 +219,8 @@ ResourceController.prototype.authorize = function(httpMethod, user, resourceId){
             }
         }, this);
 
-    } else if(this.options.acl && _.isArray(this.options.acl['all'])) {
+    }
+    if(this.options.acl && _.isArray(this.options.acl['all'])) {
         //Loop over the user roles and check if it matches on of allowed roles
         _.each(user.userroles, function(userrole) {
             console.log(`allowed roles for all methods: ${this.options.acl['all']}`);
@@ -254,10 +253,10 @@ ResourceController.prototype.authorize = function(httpMethod, user, resourceId){
                 if(hasRole || isOwner) {
                     resolve();
                 } else {
-                    reject(new AuthorizationError());
+                    reject(new errors.AuthorizationError());
                 }
             }).catch(function(err) {
-                reject(new AuthorizationError("An error occured during the authorization process."));
+                reject(new errors.AuthorizationError("An error occured during the authorization process."));
             });
         });
 

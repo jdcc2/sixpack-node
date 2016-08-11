@@ -26,7 +26,6 @@ function authJWT(req, res, next){
             return models.User.findOne({where: {id: data.claims.userId},
                 include: [models.APIToken]});
         }).then(function(user){
-            console.log(user.apitokens);
             if(user) {
                 return models.APIToken.findOne({where: {jwt: req.headers.bearer}, include: [{model: models.User, include: [{ model: models.UserRole,
                             include: [
@@ -120,7 +119,7 @@ passport.use('local', new LocalStrategy({usernameField: 'email'}, function(usern
                             console.log('login success');
                             resolve(user);
                         } else {
-                            throw new errors.LoginError('Email or password not valid');
+                            reject(new errors.LoginError('Email or password not valid'));
                         }
 
                     });
@@ -136,7 +135,7 @@ passport.use('local', new LocalStrategy({usernameField: 'email'}, function(usern
 
         }).catch(function(err){
             console.log('passport login error');
-            console.log(err);
+            console.log(typeof err);
             return done(null, false, { message: err.reason });
         });
     })
