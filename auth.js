@@ -50,6 +50,8 @@ function authJWT(req, res, next){
         }).catch(function(err){
             next(err);
         });
+    } else {
+        next();
     }
 }
 
@@ -58,6 +60,7 @@ function authCheck(req, res, next) {
     if(req.user) {
         next();
     } else {
+        console.log('redirecting to login')
         res.redirect('/auth/login')
         //throw new errors.AuthenticationError('Authentication required');
     }
