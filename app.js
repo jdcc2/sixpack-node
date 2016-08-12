@@ -28,7 +28,13 @@ var router = express.Router()
 
 //Add authentication middleware to all api routes
 apiRouter.use(auth.authJWT);
-apiRouter.use(auth.authCheck);
+apiRouter.use(auth.authCheckAPI);
+//Add access-control-header to all API calls
+apiRouter.use(function(req, res, next) {
+    console.log('Settings access-control-header');
+    res.set('Access-Control-Allow-Origin', '*');
+    next();
+});
 
 //Define the crud routes for each resource defined in controllers.js
 _.each(controllers, function(controller) {

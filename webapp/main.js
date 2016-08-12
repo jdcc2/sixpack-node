@@ -7,13 +7,24 @@ import UserManager from './components/admin/UserManager.vue'
 import AdminDashboard from './components/admin/AdminDashboard.vue'
 
 Vue.use(VueRouter);
+Vue.use(Vuex);
 
-
-let router = new VueRouter();
+let router = new VueRouter({linkActiveClass: 'is-active'});
 
 router.map({
    '/admin' : {
-       component: AdminDashboard
+       component: AdminDashboard,
+       subRoutes: {
+           '/': {
+               component: {
+                   template: '<h1>Admin Dashboard. Use the menu o nthe right.</h1>'
+               }
+           },
+           '/users': {
+               component: UserManager
+           }
+
+       }
    }
 });
 

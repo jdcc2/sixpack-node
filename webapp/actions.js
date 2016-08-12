@@ -1,8 +1,49 @@
+"use strict";
 import axios from 'axios'
 
-function handleError
+export const showMessage = function({dispatch, state}) {
 
-export const get
+};
+
+//TODO Make all update functions return a promise so a fetch can be chained
+export const fetchUsers = function({dispatch, state}) {
+    console.log('fetchusers')
+    axios({
+        method: 'get',
+        url: `${state.config.api_url}/users`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("fetch returned")
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('fetched users')
+            dispatch('USERS', response.data.data);
+        } else {
+            console.log("get users failed");
+        }
+        //First element in the items array contains the video data
+        //dispatch(videoFetchComplete(response.data.items[0]))
+
+    }).catch((response) => {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed auth");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+    });
+
+};
 
 
 export const login = function ({ dispatch, state }, email, password) {

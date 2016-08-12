@@ -62,7 +62,16 @@ function authCheck(req, res, next) {
     } else {
         console.log('redirecting to login')
         res.redirect('/auth/login')
-        //throw new errors.AuthenticationError('Authentication required');
+    }
+}
+
+function authCheckAPI(req, res, next) {
+    console.log("Cheking if user authenticated...")
+    if(req.user) {
+        next();
+    } else {
+        console.log('unauthenticated api request')
+        throw new errors.AuthenticationError('Authentication required');
     }
 }
 
@@ -221,5 +230,6 @@ module.exports = {
     authJWT,
     authRouter,
     passport,
-    authCheck
+    authCheck,
+    authCheckAPI
 }

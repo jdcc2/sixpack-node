@@ -13,11 +13,9 @@
             </div>
         </section>
         <div class="nav">
-            <div class="nav-left nav-menu">
-                <a class="nav-item is-tab" href="/#">Home</a>
-                <a class="nav-item is-tab" v-link="{path: 'admin'}">Admin</a>
-            </div>
             <div class="nav-right nav-menu">
+                <a class="nav-item is-tab" v-link="{path: '/', exact: true}">Home</a>
+                <a class="nav-item is-tab" v-link="{path: '/admin'}">Admin</a>
                 <a class="nav-item" href="/auth/logout">Logout</a>
                 <span></span>
             </div>
@@ -31,3 +29,11 @@
 
     </div>
 </template>
+
+<script>
+    import store from '../store'
+
+    export default {
+        store
+    }
+</script>

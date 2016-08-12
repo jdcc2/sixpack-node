@@ -7,11 +7,14 @@ Vue.use(Vuex);
 
 const state = {
     currentUser: null,
-    authenticated : false,
+    authenticated : true,
     config: {
-        api_url : 'http://localhost:8081'
+        api_url : 'http://localhost:3000/api'
         //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
-    }
+    },
+    users: [],
+    consumptions: [],
+    consumables: []
 };
 
 const mutations = {
@@ -21,6 +24,12 @@ const mutations = {
         state.currentUser.user_id = user_id;
         state.currentUser.user = user;
         state.currentUser.jwt = jwt;
+    },
+    CURRENTUSER (state, user) {
+        state.currentUser = user;
+    },
+    USERS (state, users) {
+        state.users = users;
     }
 };
 
