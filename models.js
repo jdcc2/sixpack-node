@@ -58,6 +58,12 @@ var models = {
         password: {
             type: Sequelize.STRING,
             allowNull: false,
+        },
+        //These foreign keys are created by the function calls below, but constraints on uniqueness are set here
+        userId: {
+            type: Sequelize.INTEGER,
+            unique: true,
+            allowNull: false
         }
     }, {
         hooks: {
@@ -226,7 +232,19 @@ var models = {
             validate: {
                 min: 0
             }
-        }
+        },
+        //These foreign keys are created by the function calls below, but constraints on uniqueness are set here
+        userId: {
+            type: Sequelize.INTEGER,
+            unique: true,
+            allowNull: false
+        },
+        roleId: {
+            type: Sequelize.STRING,
+            uniwue: true,
+            allowNull: false
+        },
+
     }),
     GoogleProfile: sequelize.define('googleprofile', {
         id: {
@@ -236,6 +254,12 @@ var models = {
         },
         token : {
             type: Sequelize.STRING,
+            allowNull: false
+        },
+        //These foreign keys are created by the function calls below, but constraints on uniqueness are set here
+        userId: {
+            type: Sequelize.INTEGER,
+            unique: true,
             allowNull: false
         }
     }),
