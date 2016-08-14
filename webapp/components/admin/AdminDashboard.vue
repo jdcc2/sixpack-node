@@ -5,7 +5,7 @@
                 <p class="menu-label">
                     Admin Dashboard
                 </p>
-                <ul class="menu-list is-three-quarters">
+                <ul class="menu-list">
                     <li>
                         <a v-link="{path: '/admin/users'}">
                             Users
@@ -14,7 +14,7 @@
                 </ul>
             </aside>
         </div>
-        <div class="column">
+        <div class="column is-three-quarters">
             <router-view></router-view>
         </div>
     </div>

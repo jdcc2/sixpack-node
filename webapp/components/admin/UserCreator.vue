@@ -1,9 +1,9 @@
 <template>
     <div class="card is-fullwidth">
         <div class="card-header">
-             <p class="card-header-title">
-                 Edit user {{ id }}
-             </p>
+            <p class="card-header-title">
+                Create user
+            </p>
         </div>
         <div class="card-content">
             <label class="label">
@@ -14,12 +14,18 @@
                 E-mail
             </label>
             <input class="input control" type="text" v-model="email">
+            <label class="label">
+                Password
+            </label>
+            <input class="input control" type="text" v-model="password">
             <input type="checkbox" class="checkbox control"  v-model="human">Human?
+            <input type="checkbox" class="checkbox control"  v-model="admin">Admin?
+            <input type="checkbox" class="checkbox control"  v-model="beerAdmin">Beer Admin?
             <p class="control">
-                <button class="button" @click="doEdit">Save</button>
+                <button class="button" @click="doCreate">Save</button>
             </p>
             <div class="notification is-danger" v-if="error">
-                Error updating user
+                Error creating user
             </div>
         </div>
 
@@ -28,33 +34,34 @@
 
 <script>
     import {getUsers} from '../../getters'
-    import {editUser} from '../../actions'
+    import {createUser} from '../../actions'
 
     export default {
         vuex: {
             actions: {
-                editUser
+                createUser
             }
         },
         data() {
             return {
                 error: false,
-                id: '',
                 name: '',
                 email: '',
+                password: '',
+                beerAdmin: false,
+                admin: false,
                 human: false
             }
 
         },
-        //Copy user properties initially so an update of the user list does not destroy the edits
-        ready() {
-            this.loadUser();
-        },
         methods: {
-            doEdit() {
+            doCreate() {
                 let notifyClose = this.notifyClose;
                 let setError = this.setError;
-                this.editUser({id: this.id, name: this.name, email: this.email, human: this.human}).then(function(success){
+                this.createUser({
+                                    name: this.name, email: this.email, password: this.password, human: this.human,
+                                    admin: this.admin, beerAdmin: this.beerAdmin
+                }).then(function(success){
                     if(success) {
                         notifyClose();
                     } else {
@@ -63,20 +70,13 @@
                 })
 
             },
-            loadUser() {
-                this.id = this.user.id;
-                this.name = this.user.name;
-                this.email = this.user.email;
-                this.human = this.user.human;
-            },
             setError() {
                 this.error = true;
             },
             notifyClose() {
-                this.$dispatch('editorClose');
+                this.$dispatch('creatorClose');
             }
-        },
-        props : ['user']
+        }
 
 
     }

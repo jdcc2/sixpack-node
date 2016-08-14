@@ -147,7 +147,7 @@ UserController.prototype.post = function(req, res, next) {
 }
 
 UserController.prototype.delete = function(req, res, next) {
-    var model = model;
+    var model = this.model;
     this.authorize('delete', req.user, req.params.id).then(function() {
         return model.findById(req.params.id);
     }).then(function(resource){
@@ -157,6 +157,29 @@ UserController.prototype.delete = function(req, res, next) {
     }).catch(function(err) {
         next(err);
     });
+}
+
+UserController.prototype.createLocal = function(req, res, next) {
+    var prepReturn = this.prepReturn.bind(this);
+    var userRoles = [];
+
+    if(req.body.hasOwnProperty('admin') && req.body.admin === true) {
+        userRoles.push({userId: 1, roleId: 'sixpackadmin'});
+    }
+
+    if(req.body.hasOwnProperty('beerAdmin') && req.body.beerAdmin === true) {
+        userRoles.push({userId: 1, roleId: 'beeradmin'});
+    }
+    models.User.create({name: req.body.name, email: req.body.email, human: req.body.human,
+            userroles: userRoles,
+            localprofile: {password: req.body.password}},
+        {include: [models.UserRole, models.LocalProfile]}).then(function(user) {
+        prepReturn(user);
+        res.json(new Response(user));
+    }).catch(function(err){
+        next(err);
+    });
+
 }
 
 UserController.prototype.authorizeRead = function(req, res, next){

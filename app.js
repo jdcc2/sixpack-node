@@ -50,6 +50,7 @@ _.each(controllers, function(controller) {
         apiRouter.delete(`/${controller.route}/:id`, controller.delete.bind(controller));
         //NOT '/users/current' does not work as it is mathced by :id in the previous routers
         apiRouter.get('/currentuser', controller.getCurrent.bind(controller));
+        apiRouter.post('/createlocaluser', controller.createLocal.bind(controller));
         apiRouter.get(`/${controller.route}`, controller.getAll.bind(controller));
         apiRouter.post(`/${controller.route}`, controller.create.bind(controller));
 
@@ -150,7 +151,9 @@ sequelize.authenticate().then(function() {
 }).then(function() {
     //make sure the admin account exists
     console.log('Creating admin account...')
-    return models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'}, defaults: { userroles: [{userId: 1, roleId: 'sixpackadmin'}], localprofile: {password: 'admin'}}, include: [models.UserRole, models.LocalProfile]});
+    return models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'},
+        defaults: { userroles: [{userId: 1, roleId: 'sixpackadmin'}], localprofile: {password: 'admin'}},
+        include: [models.UserRole, models.LocalProfile]});
 }).catch(function(err) {
     console.log('Error accessing database');
     console.log(err);

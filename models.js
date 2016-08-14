@@ -290,10 +290,10 @@ models.UserRole.belongsTo(models.User, {onDelete: 'CASCADE'});
 models.UserRole.belongsTo(models.Role, {onDelete: 'NO ACTION'});
 models.Role.hasMany(models.UserRole);
 //Authentication profiles
-models.User.hasOne(models.LocalProfile, {onDelete: 'NO ACTION'});
-models.User.hasOne(models.GoogleProfile, {onDelete: 'NO ACTION'});
+models.User.hasOne(models.LocalProfile);
+models.User.hasOne(models.GoogleProfile);
 models.LocalProfile.belongsTo(models.User, {onDelete: 'CASCADE'});
-models.GoogleProfile.belongsTo(models.User,{onDelete: 'CASCADE'});
+models.GoogleProfile.belongsTo(models.User, {onDelete: 'CASCADE'});
 
 
 module.exports = models;
