@@ -164,19 +164,20 @@ UserController.prototype.createLocal = function(req, res, next) {
     var userRoles = [];
 
     if(req.body.hasOwnProperty('admin') && req.body.admin === true) {
-        userRoles.push({userId: 1, roleId: 'sixpackadmin'});
+        userRoles.push({roleId: 'sixpackadmin'});
     }
 
     if(req.body.hasOwnProperty('beerAdmin') && req.body.beerAdmin === true) {
-        userRoles.push({userId: 1, roleId: 'beeradmin'});
+        userRoles.push({roleId: 'beeradmin'});
     }
     models.User.create({name: req.body.name, email: req.body.email, human: req.body.human,
             userroles: userRoles,
             localprofile: {password: req.body.password}},
-        {include: [models.UserRole, models.LocalProfile]}).then(function(user) {
+        {include: [models.LocalProfile, models.UserRole]}).then(function(user) {
         prepReturn(user);
         res.json(new Response(user));
     }).catch(function(err){
+        console.log(err);
         next(err);
     });
 

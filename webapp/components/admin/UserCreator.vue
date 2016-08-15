@@ -22,7 +22,7 @@
             <input type="checkbox" class="checkbox control"  v-model="admin">Admin?
             <input type="checkbox" class="checkbox control"  v-model="beerAdmin">Beer Admin?
             <p class="control">
-                <button class="button" @click="doCreate">Save</button>
+                <button class="button" @click="onCreate">Save</button>
             </p>
             <div class="notification is-danger" v-if="error">
                 Error creating user
@@ -55,7 +55,7 @@
 
         },
         methods: {
-            doCreate() {
+            onCreate() {
                 let notifyClose = this.notifyClose;
                 let setError = this.setError;
                 this.createUser({

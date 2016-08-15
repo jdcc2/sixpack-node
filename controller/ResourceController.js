@@ -138,7 +138,7 @@ ResourceController.prototype.post = function(req, res, next) {
 }
 
 ResourceController.prototype.delete = function(req, res, next) {
-    var model = model;
+    var model = this.model;
     this.authorize('delete', req.user, req.params.id).then(function() {
         return model.findById(req.params.id);
     }).then(function(resource){

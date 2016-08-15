@@ -30,6 +30,12 @@ const mutations = {
     },
     USERS (state, users) {
         state.users = users;
+    },
+    CONSUMPTIONS (state, consumptions) {
+        state.consumptions = consumptions;
+    },
+    CONSUMABLES (state, consumables) {
+        state.consumables = consumables;
     }
 };
 

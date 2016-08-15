@@ -11,6 +11,16 @@
                             Users
                         </a>
                     </li>
+                    <li>
+                        <a v-link="{path: '/admin/consumptions'}">
+                            Consumptions
+                        </a>
+                    </li>
+                    <li>
+                        <a v-link="{path: '/admin/consumables'}">
+                            Consumables
+                        </a>
+                    </li>
                 </ul>
             </aside>
         </div>

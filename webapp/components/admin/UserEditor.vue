@@ -15,11 +15,31 @@
             </label>
             <input class="input control" type="text" v-model="email">
             <input type="checkbox" class="checkbox control"  v-model="human">Human?
+            <label class="label">
+                Current roles
+            </label>
+            <span class="tag is-large" v-for="role in user.userroles">
+                <span>{{ role.roleId }}</span>
+                <button class="button delete" v-bind:index="$index" @click="doDeleteUserRole"></button>
+            </span>
+            <label class="label">
+                Add role
+            </label>
+            <p class="control">
+                <span class="select">
+                    <select v-model="selectedRole">
+                        <option>sixpackadmin</option>
+                        <option>beeradmin</option>
+                    </select>
+                </span>
+                <button class="button" @click="doAddUserRole">Add role</button>
+            </p>
+
             <p class="control">
                 <button class="button" @click="doEdit">Save</button>
             </p>
             <div class="notification is-danger" v-if="error">
-                Error updating user
+                {{ errorMessage }}
             </div>
         </div>
 
@@ -27,22 +47,27 @@
 </template>
 
 <script>
-    import {getUsers} from '../../getters'
-    import {editUser} from '../../actions'
+    import {editUser, fetchUsers, deleteUserRole, createUserRole} from '../../actions'
+    import _ from 'underscore'
 
     export default {
         vuex: {
             actions: {
-                editUser
+                editUser,
+                fetchUsers,
+                deleteUserRole,
+                createUserRole
             }
         },
         data() {
             return {
                 error: false,
+                errorMessage: '',
                 id: '',
                 name: '',
                 email: '',
-                human: false
+                human: false,
+                selectedRole: 'sixpackadmin'
             }
 
         },
@@ -58,7 +83,7 @@
                     if(success) {
                         notifyClose();
                     } else {
-                        setError();
+                        setError('Error editing user.');
                     }
                 })
 
@@ -69,8 +94,35 @@
                 this.email = this.user.email;
                 this.human = this.user.human;
             },
-            setError() {
+            doDeleteUserRole(event) {
+                let setError = this.setError;
+                let fetchUsers = this.fetchUsers;
+                this.deleteUserRole(this.user.userroles[+event.target.getAttribute('index')]).then(function(success) {
+                   if(success) {
+                       fetchUsers();
+                   } else {
+                       setError('Error deleting userrole');
+                   }
+                });
+            },
+            doAddUserRole() {
+                let setError = this.setError;
+                let fetchUsers = this.fetchUsers;
+                //The if statement checks if the user already has the role to be added
+                if(_.indexOf(_.pluck(this.user.userroles, 'roleId'), this.selectedRole) === -1) {
+                    this.createUserRole(this.id, this.selectedRole).then(function(success) {
+                        if(success) {
+                            fetchUsers();
+                        } else {
+                            setError('Error deleting userrole');
+                        }
+                    });
+                }
+
+            },
+            setError(errorMessage) {
                 this.error = true;
+                this.errorMessage = errorMessage;
             },
             notifyClose() {
                 this.$dispatch('editorClose');

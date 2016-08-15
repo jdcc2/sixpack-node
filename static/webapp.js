@@ -69,19 +69,27 @@
 	
 	var _vuex2 = _interopRequireDefault(_vuex);
 	
-	var _underscore = __webpack_require__(114);
+	var _underscore = __webpack_require__(10);
 	
 	var _underscore2 = _interopRequireDefault(_underscore);
 	
-	var _App = __webpack_require__(10);
+	var _App = __webpack_require__(11);
 	
 	var _App2 = _interopRequireDefault(_App);
 	
-	var _UserManager = __webpack_require__(15);
+	var _UserManager = __webpack_require__(16);
 	
 	var _UserManager2 = _interopRequireDefault(_UserManager);
 	
-	var _AdminDashboard = __webpack_require__(38);
+	var _ConsumptionManager = __webpack_require__(47);
+	
+	var _ConsumptionManager2 = _interopRequireDefault(_ConsumptionManager);
+	
+	var _ConsumablesManager = __webpack_require__(50);
+	
+	var _ConsumablesManager2 = _interopRequireDefault(_ConsumablesManager);
+	
+	var _AdminDashboard = __webpack_require__(45);
 	
 	var _AdminDashboard2 = _interopRequireDefault(_AdminDashboard);
 	
@@ -103,11 +111,17 @@
 	        subRoutes: {
 	            '/': {
 	                component: {
-	                    template: '<h1>Admin Dashboard. Use the menu o nthe right.</h1>'
+	                    template: '<h1>Admin Dashboard. Use the menu on the right.</h1>'
 	                }
 	            },
 	            '/users': {
 	                component: _UserManager2.default
+	            },
+	            '/consumptions': {
+	                component: _ConsumptionManager2.default
+	            },
+	            '/consumables': {
+	                component: _ConsumablesManager2.default
 	            }
 	
 	        }
@@ -14068,1973 +14082,6 @@
 /* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(11)
-	if (__vue_script__ &&
-	    __vue_script__.__esModule &&
-	    Object.keys(__vue_script__).length > 1) {
-	  console.warn("[vue-loader] webapp/components/App.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(14)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-3eaa9182/App.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _store = __webpack_require__(12);
-	
-	var _store2 = _interopRequireDefault(_store);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = {
-	    store: _store2.default
-	};
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _vuex = __webpack_require__(9);
-	
-	var _vuex2 = _interopRequireDefault(_vuex);
-	
-	var _vue = __webpack_require__(2);
-	
-	var _vue2 = _interopRequireDefault(_vue);
-	
-	var _logger = __webpack_require__(13);
-	
-	var _logger2 = _interopRequireDefault(_logger);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	_vue2.default.use(_vuex2.default);
-	
-	var state = {
-	    currentUser: null,
-	    authenticated: true,
-	    config: {
-	        api_url: 'http://localhost:3000/api'
-	        //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
-	    },
-	    users: [],
-	    consumptions: [],
-	    consumables: []
-	};
-	
-	var mutations = {
-	    LOGIN: function LOGIN(state, admin, user_id, user, jwt) {
-	        state.currentUser.authenticated = true;
-	        state.currentUser.admin = admin;
-	        state.currentUser.user_id = user_id;
-	        state.currentUser.user = user;
-	        state.currentUser.jwt = jwt;
-	    },
-	    CURRENTUSER: function CURRENTUSER(state, user) {
-	        state.currentUser = user;
-	    },
-	    USERS: function USERS(state, users) {
-	        state.users = users;
-	    }
-	};
-	
-	exports.default = new _vuex2.default.Store({
-	    state: state,
-	    mutations: mutations,
-	    middlewares: [(0, _logger2.default)()]
-	});
-
-/***/ },
-/* 13 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	// Credits: borrowed code from fcomb/redux-logger
-	
-	function createLogger() {
-	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
-	
-	  var _ref$collapsed = _ref.collapsed;
-	  var collapsed = _ref$collapsed === undefined ? true : _ref$collapsed;
-	  var _ref$transformer = _ref.transformer;
-	  var transformer = _ref$transformer === undefined ? function (state) {
-	    return state;
-	  } : _ref$transformer;
-	  var _ref$mutationTransfor = _ref.mutationTransformer;
-	  var mutationTransformer = _ref$mutationTransfor === undefined ? function (mut) {
-	    return mut;
-	  } : _ref$mutationTransfor;
-	
-	  return {
-	    snapshot: true,
-	    onMutation: function onMutation(mutation, nextState, prevState) {
-	      if (typeof console === 'undefined') {
-	        return;
-	      }
-	      var time = new Date();
-	      var formattedTime = ' @ ' + pad(time.getHours(), 2) + ':' + pad(time.getMinutes(), 2) + ':' + pad(time.getSeconds(), 2) + '.' + pad(time.getMilliseconds(), 3);
-	      var formattedMutation = mutationTransformer(mutation);
-	      var message = 'mutation ' + mutation.type + formattedTime;
-	      var startMessage = collapsed ? console.groupCollapsed : console.group;
-	
-	      // render
-	      try {
-	        startMessage.call(console, message);
-	      } catch (e) {
-	        console.log(message);
-	      }
-	
-	      console.log('%c prev state', 'color: #9E9E9E; font-weight: bold', prevState);
-	      console.log('%c mutation', 'color: #03A9F4; font-weight: bold', formattedMutation);
-	      console.log('%c next state', 'color: #4CAF50; font-weight: bold', nextState);
-	
-	      try {
-	        console.groupEnd();
-	      } catch (e) {
-	        console.log('—— log end ——');
-	      }
-	    }
-	  };
-	}
-	
-	function repeat(str, times) {
-	  return new Array(times + 1).join(str);
-	}
-	
-	function pad(num, maxLength) {
-	  return repeat('0', maxLength - num.toString().length) + num;
-	}
-	
-	module.exports = createLogger;
-
-/***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(16)
-	if (__vue_script__ &&
-	    __vue_script__.__esModule &&
-	    Object.keys(__vue_script__).length > 1) {
-	  console.warn("[vue-loader] webapp/components/admin/UserManager.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(37)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-d906e680/UserManager.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _actions = __webpack_require__(17);
-	
-	var _getters = __webpack_require__(36);
-	
-	var _UserEditor = __webpack_require__(40);
-	
-	var _UserEditor2 = _interopRequireDefault(_UserEditor);
-	
-	var _UserCreator = __webpack_require__(111);
-	
-	var _UserCreator2 = _interopRequireDefault(_UserCreator);
-	
-	var _underscore = __webpack_require__(114);
-	
-	var _underscore2 = _interopRequireDefault(_underscore);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = {
-	    data: function data() {
-	        console.log(_underscore2.default.pluck([{ "name": "peter" }], 'name'));
-	        return {
-	            selectedUser: 0,
-	            editorVisible: false,
-	            creatorVisible: false
-	        };
-	    },
-	    ready: function ready() {
-	        this.fetchUsers();
-	    },
-	
-	    vuex: {
-	        actions: {
-	            fetchUsers: _actions.fetchUsers,
-	            deleteUser: _actions.deleteUser
-	        },
-	        getters: {
-	            users: _getters.getUsers
-	        }
-	    },
-	    components: {
-	        UserEditor: _UserEditor2.default,
-	        UserCreator: _UserCreator2.default
-	    },
-	    methods: {
-	        onEdit: function onEdit(event) {
-	            this.selectedUser = +event.target.getAttribute('index');
-	            this.editorVisible = true;
-	        },
-	        onCreate: function onCreate(event) {
-	            this.creatorVisible = true;
-	        },
-	        hideEditor: function hideEditor() {
-	            this.editorVisible = false;
-	        },
-	        hideCreator: function hideCreator() {
-	            this.creatorVisible = false;
-	        },
-	        onDelete: function onDelete(event) {
-	            var fetchUsers = this.fetchUsers;
-	            this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function (success) {
-	                if (success) {
-	                    fetchUsers();
-	                }
-	            });
-	        }
-	    },
-	    events: {
-	        'editorClose': function editorClose() {
-	            this.hideEditor();
-	            this.fetchUsers();
-	        },
-	        'creatorClose': function creatorClose() {
-	            this.hideCreator();
-	            this.fetchUsers();
-	        }
-	    }
-	};
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.showMessage = undefined;
-	
-	var _axios = __webpack_require__(18);
-	
-	var _axios2 = _interopRequireDefault(_axios);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var showMessage = exports.showMessage = function showMessage(_ref) {
-	    var dispatch = _ref.dispatch;
-	    var state = _ref.state;
-	};
-	
-	//TODO Make all update functions return a promise so a fetch can be chained
-	var fetchUsers = exports.fetchUsers = function fetchUsers(_ref2) {
-	    var dispatch = _ref2.dispatch;
-	    var state = _ref2.state;
-	
-	    console.log('fetchusers');
-	    (0, _axios2.default)({
-	        method: 'get',
-	        url: state.config.api_url + '/users',
-	        headers: {
-	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
-	        },
-	        responseType: 'json'
-	
-	    }).then(function (response) {
-	        console.log("fetch returned");
-	        console.log(response);
-	        if (response.data.ok === true) {
-	            console.log('fetched users');
-	            dispatch('USERS', response.data.data);
-	        } else {
-	            console.log("get users failed");
-	        }
-	        //First element in the items array contains the video data
-	        //dispatch(videoFetchComplete(response.data.items[0]))
-	    }).catch(function (response) {
-	        if (response instanceof Error) {
-	            // Something happened in setting up the request that triggered an Error
-	            console.log('Error', response.message);
-	        } else {
-	            // The request was made, but the server responded with a status code
-	            // that falls out of the range of 2xx
-	            console.log("failed fetch");
-	            console.log(response.data);
-	            console.log(response.status);
-	            console.log(response.headers);
-	            console.log(response.config);
-	        }
-	    });
-	};
-	
-	//No related objects can be updated directly using this function
-	//Return the promise so user can wait on success
-	var editUser = exports.editUser = function editUser(_ref3, user) {
-	    var dispatch = _ref3.dispatch;
-	    var state = _ref3.state;
-	
-	    console.log('user edit');
-	    return (0, _axios2.default)({
-	        method: 'post',
-	        url: state.config.api_url + '/users/' + user.id,
-	        headers: {
-	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
-	        },
-	        data: JSON.stringify(user),
-	        responseType: 'json'
-	
-	    }).then(function (response) {
-	        console.log("user edit returned");
-	        console.log(response);
-	        if (response.data.ok === true) {
-	            console.log('edited user');
-	            return true;
-	        } else {
-	            console.log("could not edit user");
-	            return false;
-	        }
-	        //First element in the items array contains the video data
-	        //dispatch(videoFetchComplete(response.data.items[0]))
-	    }).catch(function (response) {
-	        if (response instanceof Error) {
-	            // Something happened in setting up the request that triggered an Error
-	            console.log('Error', response.message);
-	        } else {
-	            // The request was made, but the server responded with a status code
-	            // that falls out of the range of 2xx
-	            console.log("failed edit");
-	            console.log(response.data);
-	            console.log(response.status);
-	            console.log(response.headers);
-	            console.log(response.config);
-	        }
-	        return false;
-	    });;
-	};
-	
-	var deleteUser = exports.deleteUser = function deleteUser(_ref4, user) {
-	    var dispatch = _ref4.dispatch;
-	    var state = _ref4.state;
-	
-	    console.log('user delete');
-	    return (0, _axios2.default)({
-	        method: 'delete',
-	        url: state.config.api_url + '/users/' + user.id,
-	        headers: {
-	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
-	        },
-	        responseType: 'json'
-	
-	    }).then(function (response) {
-	        console.log("user delete returned");
-	        console.log(response);
-	        if (response.data.ok === true) {
-	            console.log('deleted user');
-	            return true;
-	        } else {
-	            console.log("could not delete user");
-	            return false;
-	        }
-	        //First element in the items array contains the video data
-	        //dispatch(videoFetchComplete(response.data.items[0]))
-	    }).catch(function (response) {
-	        if (response instanceof Error) {
-	            // Something happened in setting up the request that triggered an Error
-	            console.log('Error', response.message);
-	        } else {
-	            // The request was made, but the server responded with a status code
-	            // that falls out of the range of 2xx
-	            console.log("failed edit");
-	            console.log(response.data);
-	            console.log(response.status);
-	            console.log(response.headers);
-	            console.log(response.config);
-	        }
-	        return false;
-	    });;
-	};
-	
-	var createUser = exports.createUser = function createUser(_ref5, user) {
-	    var dispatch = _ref5.dispatch;
-	    var state = _ref5.state;
-	
-	    console.log('user create');
-	    return (0, _axios2.default)({
-	        method: 'post',
-	        url: state.config.api_url + '/users',
-	        headers: {
-	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
-	        },
-	        data: JSON.stringify(user),
-	        responseType: 'json'
-	
-	    }).then(function (response) {
-	        console.log("create user returned");
-	        console.log(response);
-	        if (response.data.ok === true) {
-	            console.log('created user');
-	            return true;
-	        } else {
-	            console.log("could not create user");
-	            return false;
-	        }
-	        //First element in the items array contains the video data
-	        //dispatch(videoFetchComplete(response.data.items[0]))
-	    }).catch(function (response) {
-	        if (response instanceof Error) {
-	            // Something happened in setting up the request that triggered an Error
-	            console.log('Error', response.message);
-	        } else {
-	            // The request was made, but the server responded with a status code
-	            // that falls out of the range of 2xx
-	            console.log("failed create");
-	            console.log(response.data);
-	            console.log(response.status);
-	            console.log(response.headers);
-	            console.log(response.config);
-	        }
-	        return false;
-	    });;
-	};
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = __webpack_require__(19);
-
-/***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var defaults = __webpack_require__(20);
-	var utils = __webpack_require__(21);
-	var dispatchRequest = __webpack_require__(22);
-	var InterceptorManager = __webpack_require__(31);
-	var isAbsoluteURL = __webpack_require__(32);
-	var combineURLs = __webpack_require__(33);
-	var bind = __webpack_require__(34);
-	var transformData = __webpack_require__(26);
-	
-	function Axios(defaultConfig) {
-	  this.defaults = utils.merge({}, defaultConfig);
-	  this.interceptors = {
-	    request: new InterceptorManager(),
-	    response: new InterceptorManager()
-	  };
-	}
-	
-	Axios.prototype.request = function request(config) {
-	  /*eslint no-param-reassign:0*/
-	  // Allow for axios('example/url'[, config]) a la fetch API
-	  if (typeof config === 'string') {
-	    config = utils.merge({
-	      url: arguments[0]
-	    }, arguments[1]);
-	  }
-	
-	  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
-	
-	  // Support baseURL config
-	  if (config.baseURL && !isAbsoluteURL(config.url)) {
-	    config.url = combineURLs(config.baseURL, config.url);
-	  }
-	
-	  // Don't allow overriding defaults.withCredentials
-	  config.withCredentials = config.withCredentials || this.defaults.withCredentials;
-	
-	  // Transform request data
-	  config.data = transformData(
-	    config.data,
-	    config.headers,
-	    config.transformRequest
-	  );
-	
-	  // Flatten headers
-	  config.headers = utils.merge(
-	    config.headers.common || {},
-	    config.headers[config.method] || {},
-	    config.headers || {}
-	  );
-	
-	  utils.forEach(
-	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-	    function cleanHeaderConfig(method) {
-	      delete config.headers[method];
-	    }
-	  );
-	
-	  // Hook up interceptors middleware
-	  var chain = [dispatchRequest, undefined];
-	  var promise = Promise.resolve(config);
-	
-	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
-	  });
-	
-	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-	    chain.push(interceptor.fulfilled, interceptor.rejected);
-	  });
-	
-	  while (chain.length) {
-	    promise = promise.then(chain.shift(), chain.shift());
-	  }
-	
-	  return promise;
-	};
-	
-	var defaultInstance = new Axios(defaults);
-	var axios = module.exports = bind(Axios.prototype.request, defaultInstance);
-	module.exports.Axios = Axios;
-	
-	// Expose properties from defaultInstance
-	axios.defaults = defaultInstance.defaults;
-	axios.interceptors = defaultInstance.interceptors;
-	
-	// Factory for creating new instances
-	axios.create = function create(defaultConfig) {
-	  return new Axios(defaultConfig);
-	};
-	
-	// Expose all/spread
-	axios.all = function all(promises) {
-	  return Promise.all(promises);
-	};
-	axios.spread = __webpack_require__(35);
-	
-	// Provide aliases for supported request methods
-	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
-	  /*eslint func-names:0*/
-	  Axios.prototype[method] = function(url, config) {
-	    return this.request(utils.merge(config || {}, {
-	      method: method,
-	      url: url
-	    }));
-	  };
-	  axios[method] = bind(Axios.prototype[method], defaultInstance);
-	});
-	
-	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
-	  /*eslint func-names:0*/
-	  Axios.prototype[method] = function(url, data, config) {
-	    return this.request(utils.merge(config || {}, {
-	      method: method,
-	      url: url,
-	      data: data
-	    }));
-	  };
-	  axios[method] = bind(Axios.prototype[method], defaultInstance);
-	});
-
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
-	var DEFAULT_CONTENT_TYPE = {
-	  'Content-Type': 'application/x-www-form-urlencoded'
-	};
-	
-	module.exports = {
-	  transformRequest: [function transformRequest(data, headers) {
-	    if (utils.isFormData(data) || utils.isArrayBuffer(data) || utils.isStream(data)) {
-	      return data;
-	    }
-	    if (utils.isArrayBufferView(data)) {
-	      return data.buffer;
-	    }
-	    if (utils.isObject(data) && !utils.isFile(data) && !utils.isBlob(data)) {
-	      // Set application/json if no Content-Type has been specified
-	      if (!utils.isUndefined(headers)) {
-	        utils.forEach(headers, function processContentTypeHeader(val, key) {
-	          if (key.toLowerCase() === 'content-type') {
-	            headers['Content-Type'] = val;
-	          }
-	        });
-	
-	        if (utils.isUndefined(headers['Content-Type'])) {
-	          headers['Content-Type'] = 'application/json;charset=utf-8';
-	        }
-	      }
-	      return JSON.stringify(data);
-	    }
-	    return data;
-	  }],
-	
-	  transformResponse: [function transformResponse(data) {
-	    /*eslint no-param-reassign:0*/
-	    if (typeof data === 'string') {
-	      data = data.replace(PROTECTION_PREFIX, '');
-	      try {
-	        data = JSON.parse(data);
-	      } catch (e) { /* Ignore */ }
-	    }
-	    return data;
-	  }],
-	
-	  headers: {
-	    common: {
-	      'Accept': 'application/json, text/plain, */*'
-	    },
-	    patch: utils.merge(DEFAULT_CONTENT_TYPE),
-	    post: utils.merge(DEFAULT_CONTENT_TYPE),
-	    put: utils.merge(DEFAULT_CONTENT_TYPE)
-	  },
-	
-	  timeout: 0,
-	
-	  xsrfCookieName: 'XSRF-TOKEN',
-	  xsrfHeaderName: 'X-XSRF-TOKEN',
-	
-	  maxContentLength: -1,
-	
-	  validateStatus: function validateStatus(status) {
-	    return status >= 200 && status < 300;
-	  }
-	};
-
-
-/***/ },
-/* 21 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/*global toString:true*/
-	
-	// utils is a library of generic helper functions non-specific to axios
-	
-	var toString = Object.prototype.toString;
-	
-	/**
-	 * Determine if a value is an Array
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an Array, otherwise false
-	 */
-	function isArray(val) {
-	  return toString.call(val) === '[object Array]';
-	}
-	
-	/**
-	 * Determine if a value is an ArrayBuffer
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an ArrayBuffer, otherwise false
-	 */
-	function isArrayBuffer(val) {
-	  return toString.call(val) === '[object ArrayBuffer]';
-	}
-	
-	/**
-	 * Determine if a value is a FormData
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an FormData, otherwise false
-	 */
-	function isFormData(val) {
-	  return (typeof FormData !== 'undefined') && (val instanceof FormData);
-	}
-	
-	/**
-	 * Determine if a value is a view on an ArrayBuffer
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
-	 */
-	function isArrayBufferView(val) {
-	  var result;
-	  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-	    result = ArrayBuffer.isView(val);
-	  } else {
-	    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
-	  }
-	  return result;
-	}
-	
-	/**
-	 * Determine if a value is a String
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a String, otherwise false
-	 */
-	function isString(val) {
-	  return typeof val === 'string';
-	}
-	
-	/**
-	 * Determine if a value is a Number
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Number, otherwise false
-	 */
-	function isNumber(val) {
-	  return typeof val === 'number';
-	}
-	
-	/**
-	 * Determine if a value is undefined
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if the value is undefined, otherwise false
-	 */
-	function isUndefined(val) {
-	  return typeof val === 'undefined';
-	}
-	
-	/**
-	 * Determine if a value is an Object
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an Object, otherwise false
-	 */
-	function isObject(val) {
-	  return val !== null && typeof val === 'object';
-	}
-	
-	/**
-	 * Determine if a value is a Date
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Date, otherwise false
-	 */
-	function isDate(val) {
-	  return toString.call(val) === '[object Date]';
-	}
-	
-	/**
-	 * Determine if a value is a File
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a File, otherwise false
-	 */
-	function isFile(val) {
-	  return toString.call(val) === '[object File]';
-	}
-	
-	/**
-	 * Determine if a value is a Blob
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Blob, otherwise false
-	 */
-	function isBlob(val) {
-	  return toString.call(val) === '[object Blob]';
-	}
-	
-	/**
-	 * Determine if a value is a Function
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Function, otherwise false
-	 */
-	function isFunction(val) {
-	  return toString.call(val) === '[object Function]';
-	}
-	
-	/**
-	 * Determine if a value is a Stream
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is a Stream, otherwise false
-	 */
-	function isStream(val) {
-	  return isObject(val) && isFunction(val.pipe);
-	}
-	
-	/**
-	 * Trim excess whitespace off the beginning and end of a string
-	 *
-	 * @param {String} str The String to trim
-	 * @returns {String} The String freed of excess whitespace
-	 */
-	function trim(str) {
-	  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-	}
-	
-	/**
-	 * Determine if we're running in a standard browser environment
-	 *
-	 * This allows axios to run in a web worker, and react-native.
-	 * Both environments support XMLHttpRequest, but not fully standard globals.
-	 *
-	 * web workers:
-	 *  typeof window -> undefined
-	 *  typeof document -> undefined
-	 *
-	 * react-native:
-	 *  typeof document.createElement -> undefined
-	 */
-	function isStandardBrowserEnv() {
-	  return (
-	    typeof window !== 'undefined' &&
-	    typeof document !== 'undefined' &&
-	    typeof document.createElement === 'function'
-	  );
-	}
-	
-	/**
-	 * Iterate over an Array or an Object invoking a function for each item.
-	 *
-	 * If `obj` is an Array callback will be called passing
-	 * the value, index, and complete array for each item.
-	 *
-	 * If 'obj' is an Object callback will be called passing
-	 * the value, key, and complete object for each property.
-	 *
-	 * @param {Object|Array} obj The object to iterate
-	 * @param {Function} fn The callback to invoke for each item
-	 */
-	function forEach(obj, fn) {
-	  // Don't bother if no value provided
-	  if (obj === null || typeof obj === 'undefined') {
-	    return;
-	  }
-	
-	  // Force an array if not already something iterable
-	  if (typeof obj !== 'object' && !isArray(obj)) {
-	    /*eslint no-param-reassign:0*/
-	    obj = [obj];
-	  }
-	
-	  if (isArray(obj)) {
-	    // Iterate over array values
-	    for (var i = 0, l = obj.length; i < l; i++) {
-	      fn.call(null, obj[i], i, obj);
-	    }
-	  } else {
-	    // Iterate over object keys
-	    for (var key in obj) {
-	      if (obj.hasOwnProperty(key)) {
-	        fn.call(null, obj[key], key, obj);
-	      }
-	    }
-	  }
-	}
-	
-	/**
-	 * Accepts varargs expecting each argument to be an object, then
-	 * immutably merges the properties of each object and returns result.
-	 *
-	 * When multiple objects contain the same key the later object in
-	 * the arguments list will take precedence.
-	 *
-	 * Example:
-	 *
-	 * ```js
-	 * var result = merge({foo: 123}, {foo: 456});
-	 * console.log(result.foo); // outputs 456
-	 * ```
-	 *
-	 * @param {Object} obj1 Object to merge
-	 * @returns {Object} Result of all merge properties
-	 */
-	function merge(/* obj1, obj2, obj3, ... */) {
-	  var result = {};
-	  function assignValue(val, key) {
-	    if (typeof result[key] === 'object' && typeof val === 'object') {
-	      result[key] = merge(result[key], val);
-	    } else {
-	      result[key] = val;
-	    }
-	  }
-	
-	  for (var i = 0, l = arguments.length; i < l; i++) {
-	    forEach(arguments[i], assignValue);
-	  }
-	  return result;
-	}
-	
-	module.exports = {
-	  isArray: isArray,
-	  isArrayBuffer: isArrayBuffer,
-	  isFormData: isFormData,
-	  isArrayBufferView: isArrayBufferView,
-	  isString: isString,
-	  isNumber: isNumber,
-	  isObject: isObject,
-	  isUndefined: isUndefined,
-	  isDate: isDate,
-	  isFile: isFile,
-	  isBlob: isBlob,
-	  isFunction: isFunction,
-	  isStream: isStream,
-	  isStandardBrowserEnv: isStandardBrowserEnv,
-	  forEach: forEach,
-	  merge: merge,
-	  trim: trim
-	};
-
-
-/***/ },
-/* 22 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	
-	/**
-	 * Dispatch a request to the server using whichever adapter
-	 * is supported by the current environment.
-	 *
-	 * @param {object} config The config that is to be used for the request
-	 * @returns {Promise} The Promise to be fulfilled
-	 */
-	module.exports = function dispatchRequest(config) {
-	  return new Promise(function executor(resolve, reject) {
-	    try {
-	      var adapter;
-	
-	      if (typeof config.adapter === 'function') {
-	        // For custom adapter support
-	        adapter = config.adapter;
-	      } else if (typeof XMLHttpRequest !== 'undefined') {
-	        // For browsers use XHR adapter
-	        adapter = __webpack_require__(23);
-	      } else if (typeof process !== 'undefined') {
-	        // For node use HTTP adapter
-	        adapter = __webpack_require__(23);
-	      }
-	
-	      if (typeof adapter === 'function') {
-	        adapter(resolve, reject, config);
-	      }
-	    } catch (e) {
-	      reject(e);
-	    }
-	  });
-	};
-	
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ },
-/* 23 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
-	
-	var utils = __webpack_require__(21);
-	var buildURL = __webpack_require__(24);
-	var parseHeaders = __webpack_require__(25);
-	var transformData = __webpack_require__(26);
-	var isURLSameOrigin = __webpack_require__(27);
-	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(28);
-	var settle = __webpack_require__(29);
-	
-	module.exports = function xhrAdapter(resolve, reject, config) {
-	  var requestData = config.data;
-	  var requestHeaders = config.headers;
-	
-	  if (utils.isFormData(requestData)) {
-	    delete requestHeaders['Content-Type']; // Let the browser set it
-	  }
-	
-	  var request = new XMLHttpRequest();
-	  var loadEvent = 'onreadystatechange';
-	  var xDomain = false;
-	
-	  // For IE 8/9 CORS support
-	  // Only supports POST and GET calls and doesn't returns the response headers.
-	  // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-	  if (process.env.NODE_ENV !== 'test' && typeof window !== 'undefined' && window.XDomainRequest && !('withCredentials' in request) && !isURLSameOrigin(config.url)) {
-	    request = new window.XDomainRequest();
-	    loadEvent = 'onload';
-	    xDomain = true;
-	    request.onprogress = function handleProgress() {};
-	    request.ontimeout = function handleTimeout() {};
-	  }
-	
-	  // HTTP basic authentication
-	  if (config.auth) {
-	    var username = config.auth.username || '';
-	    var password = config.auth.password || '';
-	    requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
-	  }
-	
-	  request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
-	
-	  // Set the request timeout in MS
-	  request.timeout = config.timeout;
-	
-	  // Listen for ready state
-	  request[loadEvent] = function handleLoad() {
-	    if (!request || (request.readyState !== 4 && !xDomain)) {
-	      return;
-	    }
-	
-	    // The request errored out and we didn't get a response, this will be
-	    // handled by onerror instead
-	    if (request.status === 0) {
-	      return;
-	    }
-	
-	    // Prepare the response
-	    var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
-	    var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
-	    var response = {
-	      data: transformData(
-	        responseData,
-	        responseHeaders,
-	        config.transformResponse
-	      ),
-	      // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
-	      status: request.status === 1223 ? 204 : request.status,
-	      statusText: request.status === 1223 ? 'No Content' : request.statusText,
-	      headers: responseHeaders,
-	      config: config,
-	      request: request
-	    };
-	
-	    settle(resolve, reject, response);
-	
-	    // Clean up request
-	    request = null;
-	  };
-	
-	  // Handle low level network errors
-	  request.onerror = function handleError() {
-	    // Real errors are hidden from us by the browser
-	    // onerror should only fire if it's a network error
-	    reject(new Error('Network Error'));
-	
-	    // Clean up request
-	    request = null;
-	  };
-	
-	  // Handle timeout
-	  request.ontimeout = function handleTimeout() {
-	    var err = new Error('timeout of ' + config.timeout + 'ms exceeded');
-	    err.timeout = config.timeout;
-	    err.code = 'ECONNABORTED';
-	    reject(err);
-	
-	    // Clean up request
-	    request = null;
-	  };
-	
-	  // Add xsrf header
-	  // This is only done if running in a standard browser environment.
-	  // Specifically not if we're in a web worker, or react-native.
-	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(30);
-	
-	    // Add xsrf header
-	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
-	        cookies.read(config.xsrfCookieName) :
-	        undefined;
-	
-	    if (xsrfValue) {
-	      requestHeaders[config.xsrfHeaderName] = xsrfValue;
-	    }
-	  }
-	
-	  // Add headers to the request
-	  if ('setRequestHeader' in request) {
-	    utils.forEach(requestHeaders, function setRequestHeader(val, key) {
-	      if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
-	        // Remove Content-Type if data is undefined
-	        delete requestHeaders[key];
-	      } else {
-	        // Otherwise add header to the request
-	        request.setRequestHeader(key, val);
-	      }
-	    });
-	  }
-	
-	  // Add withCredentials to request if needed
-	  if (config.withCredentials) {
-	    request.withCredentials = true;
-	  }
-	
-	  // Add responseType to request if needed
-	  if (config.responseType) {
-	    try {
-	      request.responseType = config.responseType;
-	    } catch (e) {
-	      if (request.responseType !== 'json') {
-	        throw e;
-	      }
-	    }
-	  }
-	
-	  // Handle progress if needed
-	  if (config.progress) {
-	    if (config.method === 'post' || config.method === 'put') {
-	      request.upload.addEventListener('progress', config.progress);
-	    } else if (config.method === 'get') {
-	      request.addEventListener('progress', config.progress);
-	    }
-	  }
-	
-	  if (requestData === undefined) {
-	    requestData = null;
-	  }
-	
-	  // Send the request
-	  request.send(requestData);
-	};
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ },
-/* 24 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	function encode(val) {
-	  return encodeURIComponent(val).
-	    replace(/%40/gi, '@').
-	    replace(/%3A/gi, ':').
-	    replace(/%24/g, '$').
-	    replace(/%2C/gi, ',').
-	    replace(/%20/g, '+').
-	    replace(/%5B/gi, '[').
-	    replace(/%5D/gi, ']');
-	}
-	
-	/**
-	 * Build a URL by appending params to the end
-	 *
-	 * @param {string} url The base of the url (e.g., http://www.google.com)
-	 * @param {object} [params] The params to be appended
-	 * @returns {string} The formatted url
-	 */
-	module.exports = function buildURL(url, params, paramsSerializer) {
-	  /*eslint no-param-reassign:0*/
-	  if (!params) {
-	    return url;
-	  }
-	
-	  var serializedParams;
-	  if (paramsSerializer) {
-	    serializedParams = paramsSerializer(params);
-	  } else {
-	    var parts = [];
-	
-	    utils.forEach(params, function serialize(val, key) {
-	      if (val === null || typeof val === 'undefined') {
-	        return;
-	      }
-	
-	      if (utils.isArray(val)) {
-	        key = key + '[]';
-	      }
-	
-	      if (!utils.isArray(val)) {
-	        val = [val];
-	      }
-	
-	      utils.forEach(val, function parseValue(v) {
-	        if (utils.isDate(v)) {
-	          v = v.toISOString();
-	        } else if (utils.isObject(v)) {
-	          v = JSON.stringify(v);
-	        }
-	        parts.push(encode(key) + '=' + encode(v));
-	      });
-	    });
-	
-	    serializedParams = parts.join('&');
-	  }
-	
-	  if (serializedParams) {
-	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-	  }
-	
-	  return url;
-	};
-	
-
-
-/***/ },
-/* 25 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	/**
-	 * Parse headers into an object
-	 *
-	 * ```
-	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
-	 * Content-Type: application/json
-	 * Connection: keep-alive
-	 * Transfer-Encoding: chunked
-	 * ```
-	 *
-	 * @param {String} headers Headers needing to be parsed
-	 * @returns {Object} Headers parsed into an object
-	 */
-	module.exports = function parseHeaders(headers) {
-	  var parsed = {};
-	  var key;
-	  var val;
-	  var i;
-	
-	  if (!headers) { return parsed; }
-	
-	  utils.forEach(headers.split('\n'), function parser(line) {
-	    i = line.indexOf(':');
-	    key = utils.trim(line.substr(0, i)).toLowerCase();
-	    val = utils.trim(line.substr(i + 1));
-	
-	    if (key) {
-	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-	    }
-	  });
-	
-	  return parsed;
-	};
-
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	/**
-	 * Transform the data for a request or a response
-	 *
-	 * @param {Object|String} data The data to be transformed
-	 * @param {Array} headers The headers for the request or response
-	 * @param {Array|Function} fns A single function or Array of functions
-	 * @returns {*} The resulting transformed data
-	 */
-	module.exports = function transformData(data, headers, fns) {
-	  /*eslint no-param-reassign:0*/
-	  utils.forEach(fns, function transform(fn) {
-	    data = fn(data, headers);
-	  });
-	
-	  return data;
-	};
-
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	module.exports = (
-	  utils.isStandardBrowserEnv() ?
-	
-	  // Standard browser envs have full support of the APIs needed to test
-	  // whether the request URL is of the same origin as current location.
-	  (function standardBrowserEnv() {
-	    var msie = /(msie|trident)/i.test(navigator.userAgent);
-	    var urlParsingNode = document.createElement('a');
-	    var originURL;
-	
-	    /**
-	    * Parse a URL to discover it's components
-	    *
-	    * @param {String} url The URL to be parsed
-	    * @returns {Object}
-	    */
-	    function resolveURL(url) {
-	      var href = url;
-	
-	      if (msie) {
-	        // IE needs attribute set twice to normalize properties
-	        urlParsingNode.setAttribute('href', href);
-	        href = urlParsingNode.href;
-	      }
-	
-	      urlParsingNode.setAttribute('href', href);
-	
-	      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-	      return {
-	        href: urlParsingNode.href,
-	        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-	        host: urlParsingNode.host,
-	        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-	        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-	        hostname: urlParsingNode.hostname,
-	        port: urlParsingNode.port,
-	        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-	                  urlParsingNode.pathname :
-	                  '/' + urlParsingNode.pathname
-	      };
-	    }
-	
-	    originURL = resolveURL(window.location.href);
-	
-	    /**
-	    * Determine if a URL shares the same origin as the current location
-	    *
-	    * @param {String} requestURL The URL to test
-	    * @returns {boolean} True if URL shares the same origin, otherwise false
-	    */
-	    return function isURLSameOrigin(requestURL) {
-	      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
-	      return (parsed.protocol === originURL.protocol &&
-	            parsed.host === originURL.host);
-	    };
-	  })() :
-	
-	  // Non standard browser envs (web workers, react-native) lack needed support.
-	  (function nonStandardBrowserEnv() {
-	    return function isURLSameOrigin() {
-	      return true;
-	    };
-	  })()
-	);
-
-
-/***/ },
-/* 28 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
-	
-	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-	
-	function E() {
-	  this.message = 'String contains an invalid character';
-	}
-	E.prototype = new Error;
-	E.prototype.code = 5;
-	E.prototype.name = 'InvalidCharacterError';
-	
-	function btoa(input) {
-	  var str = String(input);
-	  var output = '';
-	  for (
-	    // initialize result and counter
-	    var block, charCode, idx = 0, map = chars;
-	    // if the next str index does not exist:
-	    //   change the mapping table to "="
-	    //   check if d has no fractional digits
-	    str.charAt(idx | 0) || (map = '=', idx % 1);
-	    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
-	    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
-	  ) {
-	    charCode = str.charCodeAt(idx += 3 / 4);
-	    if (charCode > 0xFF) {
-	      throw new E();
-	    }
-	    block = block << 8 | charCode;
-	  }
-	  return output;
-	}
-	
-	module.exports = btoa;
-
-
-/***/ },
-/* 29 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Resolve or reject a Promise based on response status.
-	 *
-	 * @param {Function} resolve A function that resolves the promise.
-	 * @param {Function} reject A function that rejects the promise.
-	 * @param {object} response The response.
-	 */
-	module.exports = function settle(resolve, reject, response) {
-	  var validateStatus = response.config.validateStatus;
-	  // Note: status is not exposed by XDomainRequest
-	  if (!response.status || !validateStatus || validateStatus(response.status)) {
-	    resolve(response);
-	  } else {
-	    reject(response);
-	  }
-	};
-
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	module.exports = (
-	  utils.isStandardBrowserEnv() ?
-	
-	  // Standard browser envs support document.cookie
-	  (function standardBrowserEnv() {
-	    return {
-	      write: function write(name, value, expires, path, domain, secure) {
-	        var cookie = [];
-	        cookie.push(name + '=' + encodeURIComponent(value));
-	
-	        if (utils.isNumber(expires)) {
-	          cookie.push('expires=' + new Date(expires).toGMTString());
-	        }
-	
-	        if (utils.isString(path)) {
-	          cookie.push('path=' + path);
-	        }
-	
-	        if (utils.isString(domain)) {
-	          cookie.push('domain=' + domain);
-	        }
-	
-	        if (secure === true) {
-	          cookie.push('secure');
-	        }
-	
-	        document.cookie = cookie.join('; ');
-	      },
-	
-	      read: function read(name) {
-	        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-	        return (match ? decodeURIComponent(match[3]) : null);
-	      },
-	
-	      remove: function remove(name) {
-	        this.write(name, '', Date.now() - 86400000);
-	      }
-	    };
-	  })() :
-	
-	  // Non standard browser env (web workers, react-native) lack needed support.
-	  (function nonStandardBrowserEnv() {
-	    return {
-	      write: function write() {},
-	      read: function read() { return null; },
-	      remove: function remove() {}
-	    };
-	  })()
-	);
-
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	var utils = __webpack_require__(21);
-	
-	function InterceptorManager() {
-	  this.handlers = [];
-	}
-	
-	/**
-	 * Add a new interceptor to the stack
-	 *
-	 * @param {Function} fulfilled The function to handle `then` for a `Promise`
-	 * @param {Function} rejected The function to handle `reject` for a `Promise`
-	 *
-	 * @return {Number} An ID used to remove interceptor later
-	 */
-	InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-	  this.handlers.push({
-	    fulfilled: fulfilled,
-	    rejected: rejected
-	  });
-	  return this.handlers.length - 1;
-	};
-	
-	/**
-	 * Remove an interceptor from the stack
-	 *
-	 * @param {Number} id The ID that was returned by `use`
-	 */
-	InterceptorManager.prototype.eject = function eject(id) {
-	  if (this.handlers[id]) {
-	    this.handlers[id] = null;
-	  }
-	};
-	
-	/**
-	 * Iterate over all the registered interceptors
-	 *
-	 * This method is particularly useful for skipping over any
-	 * interceptors that may have become `null` calling `eject`.
-	 *
-	 * @param {Function} fn The function to call for each interceptor
-	 */
-	InterceptorManager.prototype.forEach = function forEach(fn) {
-	  utils.forEach(this.handlers, function forEachHandler(h) {
-	    if (h !== null) {
-	      fn(h);
-	    }
-	  });
-	};
-	
-	module.exports = InterceptorManager;
-
-
-/***/ },
-/* 32 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Determines whether the specified URL is absolute
-	 *
-	 * @param {string} url The URL to test
-	 * @returns {boolean} True if the specified URL is absolute, otherwise false
-	 */
-	module.exports = function isAbsoluteURL(url) {
-	  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-	  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-	  // by any combination of letters, digits, plus, period, or hyphen.
-	  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-	};
-
-
-/***/ },
-/* 33 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Creates a new URL by combining the specified URLs
-	 *
-	 * @param {string} baseURL The base URL
-	 * @param {string} relativeURL The relative URL
-	 * @returns {string} The combined URL
-	 */
-	module.exports = function combineURLs(baseURL, relativeURL) {
-	  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
-	};
-
-
-/***/ },
-/* 34 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	module.exports = function bind(fn, thisArg) {
-	  return function wrap() {
-	    var args = new Array(arguments.length);
-	    for (var i = 0; i < args.length; i++) {
-	      args[i] = arguments[i];
-	    }
-	    return fn.apply(thisArg, args);
-	  };
-	};
-
-
-/***/ },
-/* 35 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	/**
-	 * Syntactic sugar for invoking a function and expanding an array for arguments.
-	 *
-	 * Common use case would be to use `Function.prototype.apply`.
-	 *
-	 *  ```js
-	 *  function f(x, y, z) {}
-	 *  var args = [1, 2, 3];
-	 *  f.apply(null, args);
-	 *  ```
-	 *
-	 * With `spread` this example can be re-written.
-	 *
-	 *  ```js
-	 *  spread(function(x, y, z) {})([1, 2, 3]);
-	 *  ```
-	 *
-	 * @param {Function} callback
-	 * @returns {Function}
-	 */
-	module.exports = function spread(callback) {
-	  return function wrap(arr) {
-	    return callback.apply(null, arr);
-	  };
-	};
-
-
-/***/ },
-/* 36 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var getCurrentUser = exports.getCurrentUser = function getCurrentUser(state) {
-	  return state.currentUser;
-	};
-	var getUsers = exports.getUsers = function getUsers(state) {
-	  return state.users;
-	};
-
-/***/ },
-/* 37 */
-/***/ function(module, exports) {
-
-	module.exports = "\n\n<div class=\"modal is-active\" v-if=\"editorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-editor v-bind:user=\"users[selectedUser]\"></user-editor>\n        </div>\n    </div>\n    <button v-on:click=\"hideEditor\" class=\"modal-close\"></button>\n</div>\n\n<div class=\"modal is-active\" v-if=\"creatorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-creator></user-creator>\n        </div>\n    </div>\n    <button v-on:click=\"hideCreator\" class=\"modal-close\"></button>\n</div>\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><button v-on:click=\"onCreate\" class=\"button control\">Add user</button></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\" track-by=\"id\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button v-on:click=\"onEdit\" class=\"button is-primary control\" v-bind:index=\"$index\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
-
-/***/ },
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_template__ = __webpack_require__(39)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-afaf1ed2/AdminDashboard.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 39 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
-
-/***/ },
-/* 40 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(42)
-	if (__vue_script__ &&
-	    __vue_script__.__esModule &&
-	    Object.keys(__vue_script__).length > 1) {
-	  console.warn("[vue-loader] webapp/components/admin/UserEditor.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(41)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-d1553dac/UserEditor.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 41 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n         <p class=\"card-header-title\">\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error updating user\n        </div>\n    </div>\n\n</div>\n";
-
-/***/ },
-/* 42 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _getters = __webpack_require__(36);
-	
-	var _actions = __webpack_require__(17);
-	
-	exports.default = {
-	    vuex: {
-	        actions: {
-	            editUser: _actions.editUser
-	        }
-	    },
-	    data: function data() {
-	        return {
-	            error: false,
-	            id: '',
-	            name: '',
-	            email: '',
-	            human: false
-	        };
-	    },
-	    ready: function ready() {
-	        this.loadUser();
-	    },
-	
-	    methods: {
-	        doEdit: function doEdit() {
-	            var notifyClose = this.notifyClose;
-	            var setError = this.setError;
-	            this.editUser({ id: this.id, name: this.name, email: this.email, human: this.human }).then(function (success) {
-	                if (success) {
-	                    notifyClose();
-	                } else {
-	                    setError();
-	                }
-	            });
-	        },
-	        loadUser: function loadUser() {
-	            this.id = this.user.id;
-	            this.name = this.user.name;
-	            this.email = this.user.email;
-	            this.human = this.user.human;
-	        },
-	        setError: function setError() {
-	            this.error = true;
-	        },
-	        notifyClose: function notifyClose() {
-	            this.$dispatch('editorClose');
-	        }
-	    },
-	    props: ['user']
-	
-	};
-
-/***/ },
-/* 43 */,
-/* 44 */,
-/* 45 */,
-/* 46 */,
-/* 47 */,
-/* 48 */,
-/* 49 */,
-/* 50 */,
-/* 51 */,
-/* 52 */,
-/* 53 */,
-/* 54 */,
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */,
-/* 70 */,
-/* 71 */,
-/* 72 */,
-/* 73 */,
-/* 74 */,
-/* 75 */,
-/* 76 */,
-/* 77 */,
-/* 78 */,
-/* 79 */,
-/* 80 */,
-/* 81 */,
-/* 82 */,
-/* 83 */,
-/* 84 */,
-/* 85 */,
-/* 86 */,
-/* 87 */,
-/* 88 */,
-/* 89 */,
-/* 90 */,
-/* 91 */,
-/* 92 */,
-/* 93 */,
-/* 94 */,
-/* 95 */,
-/* 96 */,
-/* 97 */,
-/* 98 */,
-/* 99 */,
-/* 100 */,
-/* 101 */,
-/* 102 */,
-/* 103 */,
-/* 104 */,
-/* 105 */,
-/* 106 */,
-/* 107 */,
-/* 108 */,
-/* 109 */,
-/* 110 */,
-/* 111 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(112)
-	if (__vue_script__ &&
-	    __vue_script__.__esModule &&
-	    Object.keys(__vue_script__).length > 1) {
-	  console.warn("[vue-loader] webapp/components/admin/UserCreator.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(113)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-f470b482/UserCreator.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 112 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _getters = __webpack_require__(36);
-	
-	var _actions = __webpack_require__(17);
-	
-	exports.default = {
-	    vuex: {
-	        actions: {
-	            createUser: _actions.createUser
-	        }
-	    },
-	    data: function data() {
-	        return {
-	            error: false,
-	            name: '',
-	            email: '',
-	            password: '',
-	            beerAdmin: false,
-	            admin: false,
-	            human: false
-	        };
-	    },
-	
-	    methods: {
-	        doCreate: function doCreate() {
-	            var notifyClose = this.notifyClose;
-	            var setError = this.setError;
-	            this.createUser({
-	                name: this.name, email: this.email, password: this.password, human: this.human,
-	                admin: this.admin, beerAdmin: this.beerAdmin
-	            }).then(function (success) {
-	                if (success) {
-	                    notifyClose();
-	                } else {
-	                    setError();
-	                }
-	            });
-	        },
-	        setError: function setError() {
-	            this.error = true;
-	        },
-	        notifyClose: function notifyClose() {
-	            this.$dispatch('creatorClose');
-	        }
-	    }
-	
-	};
-
-/***/ },
-/* 113 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            Create user\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"admin\">Admin?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"beerAdmin\">Beer Admin?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doCreate\">Save</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error creating user\n        </div>\n    </div>\n\n</div>\n";
-
-/***/ },
-/* 114 */
-/***/ function(module, exports, __webpack_require__) {
-
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
 	//     http://underscorejs.org
 	//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
@@ -17584,6 +15631,2335 @@
 	  }
 	}.call(this));
 
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(12)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/App.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(15)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-3eaa9182/App.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _store = __webpack_require__(13);
+	
+	var _store2 = _interopRequireDefault(_store);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    store: _store2.default
+	};
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _vuex = __webpack_require__(9);
+	
+	var _vuex2 = _interopRequireDefault(_vuex);
+	
+	var _vue = __webpack_require__(2);
+	
+	var _vue2 = _interopRequireDefault(_vue);
+	
+	var _logger = __webpack_require__(14);
+	
+	var _logger2 = _interopRequireDefault(_logger);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	_vue2.default.use(_vuex2.default);
+	
+	var state = {
+	    currentUser: null,
+	    authenticated: true,
+	    config: {
+	        api_url: 'http://localhost:3000/api'
+	        //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
+	    },
+	    users: [],
+	    consumptions: [],
+	    consumables: []
+	};
+	
+	var mutations = {
+	    LOGIN: function LOGIN(state, admin, user_id, user, jwt) {
+	        state.currentUser.authenticated = true;
+	        state.currentUser.admin = admin;
+	        state.currentUser.user_id = user_id;
+	        state.currentUser.user = user;
+	        state.currentUser.jwt = jwt;
+	    },
+	    CURRENTUSER: function CURRENTUSER(state, user) {
+	        state.currentUser = user;
+	    },
+	    USERS: function USERS(state, users) {
+	        state.users = users;
+	    },
+	    CONSUMPTIONS: function CONSUMPTIONS(state, consumptions) {
+	        state.consumptions = consumptions;
+	    },
+	    CONSUMABLES: function CONSUMABLES(state, consumables) {
+	        state.consumables = consumables;
+	    }
+	};
+	
+	exports.default = new _vuex2.default.Store({
+	    state: state,
+	    mutations: mutations,
+	    middlewares: [(0, _logger2.default)()]
+	});
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	// Credits: borrowed code from fcomb/redux-logger
+	
+	function createLogger() {
+	  var _ref = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+	
+	  var _ref$collapsed = _ref.collapsed;
+	  var collapsed = _ref$collapsed === undefined ? true : _ref$collapsed;
+	  var _ref$transformer = _ref.transformer;
+	  var transformer = _ref$transformer === undefined ? function (state) {
+	    return state;
+	  } : _ref$transformer;
+	  var _ref$mutationTransfor = _ref.mutationTransformer;
+	  var mutationTransformer = _ref$mutationTransfor === undefined ? function (mut) {
+	    return mut;
+	  } : _ref$mutationTransfor;
+	
+	  return {
+	    snapshot: true,
+	    onMutation: function onMutation(mutation, nextState, prevState) {
+	      if (typeof console === 'undefined') {
+	        return;
+	      }
+	      var time = new Date();
+	      var formattedTime = ' @ ' + pad(time.getHours(), 2) + ':' + pad(time.getMinutes(), 2) + ':' + pad(time.getSeconds(), 2) + '.' + pad(time.getMilliseconds(), 3);
+	      var formattedMutation = mutationTransformer(mutation);
+	      var message = 'mutation ' + mutation.type + formattedTime;
+	      var startMessage = collapsed ? console.groupCollapsed : console.group;
+	
+	      // render
+	      try {
+	        startMessage.call(console, message);
+	      } catch (e) {
+	        console.log(message);
+	      }
+	
+	      console.log('%c prev state', 'color: #9E9E9E; font-weight: bold', prevState);
+	      console.log('%c mutation', 'color: #03A9F4; font-weight: bold', formattedMutation);
+	      console.log('%c next state', 'color: #4CAF50; font-weight: bold', nextState);
+	
+	      try {
+	        console.groupEnd();
+	      } catch (e) {
+	        console.log('—— log end ——');
+	      }
+	    }
+	  };
+	}
+	
+	function repeat(str, times) {
+	  return new Array(times + 1).join(str);
+	}
+	
+	function pad(num, maxLength) {
+	  return repeat('0', maxLength - num.toString().length) + num;
+	}
+	
+	module.exports = createLogger;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(17)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/UserManager.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(44)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-d906e680/UserManager.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _actions = __webpack_require__(18);
+	
+	var _getters = __webpack_require__(37);
+	
+	var _UserEditor = __webpack_require__(38);
+	
+	var _UserEditor2 = _interopRequireDefault(_UserEditor);
+	
+	var _UserCreator = __webpack_require__(41);
+	
+	var _UserCreator2 = _interopRequireDefault(_UserCreator);
+	
+	var _underscore = __webpack_require__(10);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    data: function data() {
+	        console.log(_underscore2.default.pluck([{ "name": "peter" }], 'name'));
+	        return {
+	            selectedUser: 0,
+	            editorVisible: false,
+	            creatorVisible: false
+	        };
+	    },
+	    ready: function ready() {
+	        this.fetchUsers();
+	    },
+	
+	    vuex: {
+	        actions: {
+	            fetchUsers: _actions.fetchUsers,
+	            deleteUser: _actions.deleteUser
+	        },
+	        getters: {
+	            users: _getters.getUsers
+	        }
+	    },
+	    components: {
+	        UserEditor: _UserEditor2.default,
+	        UserCreator: _UserCreator2.default
+	    },
+	    methods: {
+	        onEdit: function onEdit(event) {
+	            this.selectedUser = +event.target.getAttribute('index');
+	            this.editorVisible = true;
+	        },
+	        onCreate: function onCreate(event) {
+	            this.creatorVisible = true;
+	        },
+	        hideEditor: function hideEditor() {
+	            this.editorVisible = false;
+	        },
+	        hideCreator: function hideCreator() {
+	            this.creatorVisible = false;
+	        },
+	        onDelete: function onDelete(event) {
+	            var fetchUsers = this.fetchUsers;
+	            this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function (success) {
+	                if (success) {
+	                    fetchUsers();
+	                }
+	            });
+	        }
+	    },
+	    events: {
+	        'editorClose': function editorClose() {
+	            this.hideEditor();
+	            this.fetchUsers();
+	        },
+	        'creatorClose': function creatorClose() {
+	            this.hideCreator();
+	            this.fetchUsers();
+	        }
+	    }
+	};
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.showMessage = undefined;
+	
+	var _axios = __webpack_require__(19);
+	
+	var _axios2 = _interopRequireDefault(_axios);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var showMessage = exports.showMessage = function showMessage(_ref) {
+	    var dispatch = _ref.dispatch;
+	    var state = _ref.state;
+	};
+	
+	//TODO Make all update functions return a promise so a fetch can be chained
+	var fetchUsers = exports.fetchUsers = function fetchUsers(_ref2) {
+	    var dispatch = _ref2.dispatch;
+	    var state = _ref2.state;
+	
+	    console.log('fetchusers');
+	    (0, _axios2.default)({
+	        method: 'get',
+	        url: state.config.api_url + '/users',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("fetch returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('fetched users');
+	            dispatch('USERS', response.data.data);
+	        } else {
+	            console.log("get users failed");
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed fetch");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	    });
+	};
+	
+	//No related objects can be updated directly using this function
+	//Return the promise so user can wait on success
+	var editUser = exports.editUser = function editUser(_ref3, user) {
+	    var dispatch = _ref3.dispatch;
+	    var state = _ref3.state;
+	
+	    console.log('user edit');
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.api_url + '/users/' + user.id,
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify(user),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("user edit returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('edited user');
+	            return true;
+	        } else {
+	            console.log("could not edit user");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed edit");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var deleteUser = exports.deleteUser = function deleteUser(_ref4, user) {
+	    var dispatch = _ref4.dispatch;
+	    var state = _ref4.state;
+	
+	    console.log('user delete');
+	    return (0, _axios2.default)({
+	        method: 'delete',
+	        url: state.config.api_url + '/users/' + user.id,
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("user delete returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('deleted user');
+	            return true;
+	        } else {
+	            console.log("could not delete user");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed edit");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var createUser = exports.createUser = function createUser(_ref5, user) {
+	    var dispatch = _ref5.dispatch;
+	    var state = _ref5.state;
+	
+	    console.log('user create');
+	    console.log(user);
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.api_url + '/createlocaluser',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify(user),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("create user returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('created user');
+	            return true;
+	        } else {
+	            console.log("could not create user");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed create");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var createUserRole = exports.createUserRole = function createUserRole(_ref6, userId, roleId) {
+	    var dispatch = _ref6.dispatch;
+	    var state = _ref6.state;
+	
+	    console.log('userrole create');
+	    console.log(userId);
+	    console.log(roleId);
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.api_url + '/userroles',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify({ userId: userId, roleId: roleId }),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("create userrole returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('created userrole');
+	            return true;
+	        } else {
+	            console.log("could not create userrole");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed create userrole");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var deleteUserRole = exports.deleteUserRole = function deleteUserRole(_ref7, userrole) {
+	    var dispatch = _ref7.dispatch;
+	    var state = _ref7.state;
+	
+	    console.log('userrole delete');
+	    return (0, _axios2.default)({
+	        method: 'delete',
+	        url: state.config.api_url + '/userroles/' + userrole.id,
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("userrole delete returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('deleted userrole');
+	            return true;
+	        } else {
+	            console.log("could not delete userrole");
+	            return false;
+	        }
+	        //First element in the items array contains the video data
+	        //dispatch(videoFetchComplete(response.data.items[0]))
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed userrole delete");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var fetchConsumptions = exports.fetchConsumptions = function fetchConsumptions(_ref8) {
+	    var dispatch = _ref8.dispatch;
+	    var state = _ref8.state;
+	
+	    console.log('fetchConsumptions');
+	    (0, _axios2.default)({
+	        method: 'get',
+	        url: state.config.api_url + '/consumptions',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("fetch consumptions returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('fetched consumptions');
+	            dispatch('CONSUMPTIONS', response.data.data);
+	        } else {
+	            console.log("get consumptions failed");
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed consumptions fetch");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	    });
+	};
+	
+	var fetchConsumables = exports.fetchConsumables = function fetchConsumables(_ref9) {
+	    var dispatch = _ref9.dispatch;
+	    var state = _ref9.state;
+	
+	    console.log('fetchConsumables');
+	    (0, _axios2.default)({
+	        method: 'get',
+	        url: state.config.api_url + '/consumables',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("fetch consumables returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('fetched consumables');
+	            dispatch('CONSUMABLES', response.data.data);
+	        } else {
+	            console.log("get consumables failed");
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed consumables fetch");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	    });
+	};
+	
+	var createConsumable = exports.createConsumable = function createConsumable(_ref10, name, description) {
+	    var dispatch = _ref10.dispatch;
+	    var state = _ref10.state;
+	
+	    console.log('consumable create');
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.api_url + '/consumables',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify({ name: name, description: description }),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("create consumable returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('created consumable');
+	            return true;
+	        } else {
+	            console.log("could not create consumable");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed create consumable");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+
+/***/ },
+/* 19 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(20);
+
+/***/ },
+/* 20 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var defaults = __webpack_require__(21);
+	var utils = __webpack_require__(22);
+	var dispatchRequest = __webpack_require__(23);
+	var InterceptorManager = __webpack_require__(32);
+	var isAbsoluteURL = __webpack_require__(33);
+	var combineURLs = __webpack_require__(34);
+	var bind = __webpack_require__(35);
+	var transformData = __webpack_require__(27);
+	
+	function Axios(defaultConfig) {
+	  this.defaults = utils.merge({}, defaultConfig);
+	  this.interceptors = {
+	    request: new InterceptorManager(),
+	    response: new InterceptorManager()
+	  };
+	}
+	
+	Axios.prototype.request = function request(config) {
+	  /*eslint no-param-reassign:0*/
+	  // Allow for axios('example/url'[, config]) a la fetch API
+	  if (typeof config === 'string') {
+	    config = utils.merge({
+	      url: arguments[0]
+	    }, arguments[1]);
+	  }
+	
+	  config = utils.merge(defaults, this.defaults, { method: 'get' }, config);
+	
+	  // Support baseURL config
+	  if (config.baseURL && !isAbsoluteURL(config.url)) {
+	    config.url = combineURLs(config.baseURL, config.url);
+	  }
+	
+	  // Don't allow overriding defaults.withCredentials
+	  config.withCredentials = config.withCredentials || this.defaults.withCredentials;
+	
+	  // Transform request data
+	  config.data = transformData(
+	    config.data,
+	    config.headers,
+	    config.transformRequest
+	  );
+	
+	  // Flatten headers
+	  config.headers = utils.merge(
+	    config.headers.common || {},
+	    config.headers[config.method] || {},
+	    config.headers || {}
+	  );
+	
+	  utils.forEach(
+	    ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+	    function cleanHeaderConfig(method) {
+	      delete config.headers[method];
+	    }
+	  );
+	
+	  // Hook up interceptors middleware
+	  var chain = [dispatchRequest, undefined];
+	  var promise = Promise.resolve(config);
+	
+	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
+	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
+	  });
+	
+	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
+	    chain.push(interceptor.fulfilled, interceptor.rejected);
+	  });
+	
+	  while (chain.length) {
+	    promise = promise.then(chain.shift(), chain.shift());
+	  }
+	
+	  return promise;
+	};
+	
+	var defaultInstance = new Axios(defaults);
+	var axios = module.exports = bind(Axios.prototype.request, defaultInstance);
+	module.exports.Axios = Axios;
+	
+	// Expose properties from defaultInstance
+	axios.defaults = defaultInstance.defaults;
+	axios.interceptors = defaultInstance.interceptors;
+	
+	// Factory for creating new instances
+	axios.create = function create(defaultConfig) {
+	  return new Axios(defaultConfig);
+	};
+	
+	// Expose all/spread
+	axios.all = function all(promises) {
+	  return Promise.all(promises);
+	};
+	axios.spread = __webpack_require__(36);
+	
+	// Provide aliases for supported request methods
+	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, config) {
+	    return this.request(utils.merge(config || {}, {
+	      method: method,
+	      url: url
+	    }));
+	  };
+	  axios[method] = bind(Axios.prototype[method], defaultInstance);
+	});
+	
+	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, data, config) {
+	    return this.request(utils.merge(config || {}, {
+	      method: method,
+	      url: url,
+	      data: data
+	    }));
+	  };
+	  axios[method] = bind(Axios.prototype[method], defaultInstance);
+	});
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
+	var DEFAULT_CONTENT_TYPE = {
+	  'Content-Type': 'application/x-www-form-urlencoded'
+	};
+	
+	module.exports = {
+	  transformRequest: [function transformRequest(data, headers) {
+	    if (utils.isFormData(data) || utils.isArrayBuffer(data) || utils.isStream(data)) {
+	      return data;
+	    }
+	    if (utils.isArrayBufferView(data)) {
+	      return data.buffer;
+	    }
+	    if (utils.isObject(data) && !utils.isFile(data) && !utils.isBlob(data)) {
+	      // Set application/json if no Content-Type has been specified
+	      if (!utils.isUndefined(headers)) {
+	        utils.forEach(headers, function processContentTypeHeader(val, key) {
+	          if (key.toLowerCase() === 'content-type') {
+	            headers['Content-Type'] = val;
+	          }
+	        });
+	
+	        if (utils.isUndefined(headers['Content-Type'])) {
+	          headers['Content-Type'] = 'application/json;charset=utf-8';
+	        }
+	      }
+	      return JSON.stringify(data);
+	    }
+	    return data;
+	  }],
+	
+	  transformResponse: [function transformResponse(data) {
+	    /*eslint no-param-reassign:0*/
+	    if (typeof data === 'string') {
+	      data = data.replace(PROTECTION_PREFIX, '');
+	      try {
+	        data = JSON.parse(data);
+	      } catch (e) { /* Ignore */ }
+	    }
+	    return data;
+	  }],
+	
+	  headers: {
+	    common: {
+	      'Accept': 'application/json, text/plain, */*'
+	    },
+	    patch: utils.merge(DEFAULT_CONTENT_TYPE),
+	    post: utils.merge(DEFAULT_CONTENT_TYPE),
+	    put: utils.merge(DEFAULT_CONTENT_TYPE)
+	  },
+	
+	  timeout: 0,
+	
+	  xsrfCookieName: 'XSRF-TOKEN',
+	  xsrfHeaderName: 'X-XSRF-TOKEN',
+	
+	  maxContentLength: -1,
+	
+	  validateStatus: function validateStatus(status) {
+	    return status >= 200 && status < 300;
+	  }
+	};
+
+
+/***/ },
+/* 22 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/*global toString:true*/
+	
+	// utils is a library of generic helper functions non-specific to axios
+	
+	var toString = Object.prototype.toString;
+	
+	/**
+	 * Determine if a value is an Array
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an Array, otherwise false
+	 */
+	function isArray(val) {
+	  return toString.call(val) === '[object Array]';
+	}
+	
+	/**
+	 * Determine if a value is an ArrayBuffer
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+	 */
+	function isArrayBuffer(val) {
+	  return toString.call(val) === '[object ArrayBuffer]';
+	}
+	
+	/**
+	 * Determine if a value is a FormData
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an FormData, otherwise false
+	 */
+	function isFormData(val) {
+	  return (typeof FormData !== 'undefined') && (val instanceof FormData);
+	}
+	
+	/**
+	 * Determine if a value is a view on an ArrayBuffer
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+	 */
+	function isArrayBufferView(val) {
+	  var result;
+	  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+	    result = ArrayBuffer.isView(val);
+	  } else {
+	    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+	  }
+	  return result;
+	}
+	
+	/**
+	 * Determine if a value is a String
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a String, otherwise false
+	 */
+	function isString(val) {
+	  return typeof val === 'string';
+	}
+	
+	/**
+	 * Determine if a value is a Number
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Number, otherwise false
+	 */
+	function isNumber(val) {
+	  return typeof val === 'number';
+	}
+	
+	/**
+	 * Determine if a value is undefined
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if the value is undefined, otherwise false
+	 */
+	function isUndefined(val) {
+	  return typeof val === 'undefined';
+	}
+	
+	/**
+	 * Determine if a value is an Object
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is an Object, otherwise false
+	 */
+	function isObject(val) {
+	  return val !== null && typeof val === 'object';
+	}
+	
+	/**
+	 * Determine if a value is a Date
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Date, otherwise false
+	 */
+	function isDate(val) {
+	  return toString.call(val) === '[object Date]';
+	}
+	
+	/**
+	 * Determine if a value is a File
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a File, otherwise false
+	 */
+	function isFile(val) {
+	  return toString.call(val) === '[object File]';
+	}
+	
+	/**
+	 * Determine if a value is a Blob
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Blob, otherwise false
+	 */
+	function isBlob(val) {
+	  return toString.call(val) === '[object Blob]';
+	}
+	
+	/**
+	 * Determine if a value is a Function
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Function, otherwise false
+	 */
+	function isFunction(val) {
+	  return toString.call(val) === '[object Function]';
+	}
+	
+	/**
+	 * Determine if a value is a Stream
+	 *
+	 * @param {Object} val The value to test
+	 * @returns {boolean} True if value is a Stream, otherwise false
+	 */
+	function isStream(val) {
+	  return isObject(val) && isFunction(val.pipe);
+	}
+	
+	/**
+	 * Trim excess whitespace off the beginning and end of a string
+	 *
+	 * @param {String} str The String to trim
+	 * @returns {String} The String freed of excess whitespace
+	 */
+	function trim(str) {
+	  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+	}
+	
+	/**
+	 * Determine if we're running in a standard browser environment
+	 *
+	 * This allows axios to run in a web worker, and react-native.
+	 * Both environments support XMLHttpRequest, but not fully standard globals.
+	 *
+	 * web workers:
+	 *  typeof window -> undefined
+	 *  typeof document -> undefined
+	 *
+	 * react-native:
+	 *  typeof document.createElement -> undefined
+	 */
+	function isStandardBrowserEnv() {
+	  return (
+	    typeof window !== 'undefined' &&
+	    typeof document !== 'undefined' &&
+	    typeof document.createElement === 'function'
+	  );
+	}
+	
+	/**
+	 * Iterate over an Array or an Object invoking a function for each item.
+	 *
+	 * If `obj` is an Array callback will be called passing
+	 * the value, index, and complete array for each item.
+	 *
+	 * If 'obj' is an Object callback will be called passing
+	 * the value, key, and complete object for each property.
+	 *
+	 * @param {Object|Array} obj The object to iterate
+	 * @param {Function} fn The callback to invoke for each item
+	 */
+	function forEach(obj, fn) {
+	  // Don't bother if no value provided
+	  if (obj === null || typeof obj === 'undefined') {
+	    return;
+	  }
+	
+	  // Force an array if not already something iterable
+	  if (typeof obj !== 'object' && !isArray(obj)) {
+	    /*eslint no-param-reassign:0*/
+	    obj = [obj];
+	  }
+	
+	  if (isArray(obj)) {
+	    // Iterate over array values
+	    for (var i = 0, l = obj.length; i < l; i++) {
+	      fn.call(null, obj[i], i, obj);
+	    }
+	  } else {
+	    // Iterate over object keys
+	    for (var key in obj) {
+	      if (obj.hasOwnProperty(key)) {
+	        fn.call(null, obj[key], key, obj);
+	      }
+	    }
+	  }
+	}
+	
+	/**
+	 * Accepts varargs expecting each argument to be an object, then
+	 * immutably merges the properties of each object and returns result.
+	 *
+	 * When multiple objects contain the same key the later object in
+	 * the arguments list will take precedence.
+	 *
+	 * Example:
+	 *
+	 * ```js
+	 * var result = merge({foo: 123}, {foo: 456});
+	 * console.log(result.foo); // outputs 456
+	 * ```
+	 *
+	 * @param {Object} obj1 Object to merge
+	 * @returns {Object} Result of all merge properties
+	 */
+	function merge(/* obj1, obj2, obj3, ... */) {
+	  var result = {};
+	  function assignValue(val, key) {
+	    if (typeof result[key] === 'object' && typeof val === 'object') {
+	      result[key] = merge(result[key], val);
+	    } else {
+	      result[key] = val;
+	    }
+	  }
+	
+	  for (var i = 0, l = arguments.length; i < l; i++) {
+	    forEach(arguments[i], assignValue);
+	  }
+	  return result;
+	}
+	
+	module.exports = {
+	  isArray: isArray,
+	  isArrayBuffer: isArrayBuffer,
+	  isFormData: isFormData,
+	  isArrayBufferView: isArrayBufferView,
+	  isString: isString,
+	  isNumber: isNumber,
+	  isObject: isObject,
+	  isUndefined: isUndefined,
+	  isDate: isDate,
+	  isFile: isFile,
+	  isBlob: isBlob,
+	  isFunction: isFunction,
+	  isStream: isStream,
+	  isStandardBrowserEnv: isStandardBrowserEnv,
+	  forEach: forEach,
+	  merge: merge,
+	  trim: trim
+	};
+
+
+/***/ },
+/* 23 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	
+	/**
+	 * Dispatch a request to the server using whichever adapter
+	 * is supported by the current environment.
+	 *
+	 * @param {object} config The config that is to be used for the request
+	 * @returns {Promise} The Promise to be fulfilled
+	 */
+	module.exports = function dispatchRequest(config) {
+	  return new Promise(function executor(resolve, reject) {
+	    try {
+	      var adapter;
+	
+	      if (typeof config.adapter === 'function') {
+	        // For custom adapter support
+	        adapter = config.adapter;
+	      } else if (typeof XMLHttpRequest !== 'undefined') {
+	        // For browsers use XHR adapter
+	        adapter = __webpack_require__(24);
+	      } else if (typeof process !== 'undefined') {
+	        // For node use HTTP adapter
+	        adapter = __webpack_require__(24);
+	      }
+	
+	      if (typeof adapter === 'function') {
+	        adapter(resolve, reject, config);
+	      }
+	    } catch (e) {
+	      reject(e);
+	    }
+	  });
+	};
+	
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
+	
+	var utils = __webpack_require__(22);
+	var buildURL = __webpack_require__(25);
+	var parseHeaders = __webpack_require__(26);
+	var transformData = __webpack_require__(27);
+	var isURLSameOrigin = __webpack_require__(28);
+	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(29);
+	var settle = __webpack_require__(30);
+	
+	module.exports = function xhrAdapter(resolve, reject, config) {
+	  var requestData = config.data;
+	  var requestHeaders = config.headers;
+	
+	  if (utils.isFormData(requestData)) {
+	    delete requestHeaders['Content-Type']; // Let the browser set it
+	  }
+	
+	  var request = new XMLHttpRequest();
+	  var loadEvent = 'onreadystatechange';
+	  var xDomain = false;
+	
+	  // For IE 8/9 CORS support
+	  // Only supports POST and GET calls and doesn't returns the response headers.
+	  // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
+	  if (process.env.NODE_ENV !== 'test' && typeof window !== 'undefined' && window.XDomainRequest && !('withCredentials' in request) && !isURLSameOrigin(config.url)) {
+	    request = new window.XDomainRequest();
+	    loadEvent = 'onload';
+	    xDomain = true;
+	    request.onprogress = function handleProgress() {};
+	    request.ontimeout = function handleTimeout() {};
+	  }
+	
+	  // HTTP basic authentication
+	  if (config.auth) {
+	    var username = config.auth.username || '';
+	    var password = config.auth.password || '';
+	    requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+	  }
+	
+	  request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+	
+	  // Set the request timeout in MS
+	  request.timeout = config.timeout;
+	
+	  // Listen for ready state
+	  request[loadEvent] = function handleLoad() {
+	    if (!request || (request.readyState !== 4 && !xDomain)) {
+	      return;
+	    }
+	
+	    // The request errored out and we didn't get a response, this will be
+	    // handled by onerror instead
+	    if (request.status === 0) {
+	      return;
+	    }
+	
+	    // Prepare the response
+	    var responseHeaders = 'getAllResponseHeaders' in request ? parseHeaders(request.getAllResponseHeaders()) : null;
+	    var responseData = !config.responseType || config.responseType === 'text' ? request.responseText : request.response;
+	    var response = {
+	      data: transformData(
+	        responseData,
+	        responseHeaders,
+	        config.transformResponse
+	      ),
+	      // IE sends 1223 instead of 204 (https://github.com/mzabriskie/axios/issues/201)
+	      status: request.status === 1223 ? 204 : request.status,
+	      statusText: request.status === 1223 ? 'No Content' : request.statusText,
+	      headers: responseHeaders,
+	      config: config,
+	      request: request
+	    };
+	
+	    settle(resolve, reject, response);
+	
+	    // Clean up request
+	    request = null;
+	  };
+	
+	  // Handle low level network errors
+	  request.onerror = function handleError() {
+	    // Real errors are hidden from us by the browser
+	    // onerror should only fire if it's a network error
+	    reject(new Error('Network Error'));
+	
+	    // Clean up request
+	    request = null;
+	  };
+	
+	  // Handle timeout
+	  request.ontimeout = function handleTimeout() {
+	    var err = new Error('timeout of ' + config.timeout + 'ms exceeded');
+	    err.timeout = config.timeout;
+	    err.code = 'ECONNABORTED';
+	    reject(err);
+	
+	    // Clean up request
+	    request = null;
+	  };
+	
+	  // Add xsrf header
+	  // This is only done if running in a standard browser environment.
+	  // Specifically not if we're in a web worker, or react-native.
+	  if (utils.isStandardBrowserEnv()) {
+	    var cookies = __webpack_require__(31);
+	
+	    // Add xsrf header
+	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
+	        cookies.read(config.xsrfCookieName) :
+	        undefined;
+	
+	    if (xsrfValue) {
+	      requestHeaders[config.xsrfHeaderName] = xsrfValue;
+	    }
+	  }
+	
+	  // Add headers to the request
+	  if ('setRequestHeader' in request) {
+	    utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+	      if (typeof requestData === 'undefined' && key.toLowerCase() === 'content-type') {
+	        // Remove Content-Type if data is undefined
+	        delete requestHeaders[key];
+	      } else {
+	        // Otherwise add header to the request
+	        request.setRequestHeader(key, val);
+	      }
+	    });
+	  }
+	
+	  // Add withCredentials to request if needed
+	  if (config.withCredentials) {
+	    request.withCredentials = true;
+	  }
+	
+	  // Add responseType to request if needed
+	  if (config.responseType) {
+	    try {
+	      request.responseType = config.responseType;
+	    } catch (e) {
+	      if (request.responseType !== 'json') {
+	        throw e;
+	      }
+	    }
+	  }
+	
+	  // Handle progress if needed
+	  if (config.progress) {
+	    if (config.method === 'post' || config.method === 'put') {
+	      request.upload.addEventListener('progress', config.progress);
+	    } else if (config.method === 'get') {
+	      request.addEventListener('progress', config.progress);
+	    }
+	  }
+	
+	  if (requestData === undefined) {
+	    requestData = null;
+	  }
+	
+	  // Send the request
+	  request.send(requestData);
+	};
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	function encode(val) {
+	  return encodeURIComponent(val).
+	    replace(/%40/gi, '@').
+	    replace(/%3A/gi, ':').
+	    replace(/%24/g, '$').
+	    replace(/%2C/gi, ',').
+	    replace(/%20/g, '+').
+	    replace(/%5B/gi, '[').
+	    replace(/%5D/gi, ']');
+	}
+	
+	/**
+	 * Build a URL by appending params to the end
+	 *
+	 * @param {string} url The base of the url (e.g., http://www.google.com)
+	 * @param {object} [params] The params to be appended
+	 * @returns {string} The formatted url
+	 */
+	module.exports = function buildURL(url, params, paramsSerializer) {
+	  /*eslint no-param-reassign:0*/
+	  if (!params) {
+	    return url;
+	  }
+	
+	  var serializedParams;
+	  if (paramsSerializer) {
+	    serializedParams = paramsSerializer(params);
+	  } else {
+	    var parts = [];
+	
+	    utils.forEach(params, function serialize(val, key) {
+	      if (val === null || typeof val === 'undefined') {
+	        return;
+	      }
+	
+	      if (utils.isArray(val)) {
+	        key = key + '[]';
+	      }
+	
+	      if (!utils.isArray(val)) {
+	        val = [val];
+	      }
+	
+	      utils.forEach(val, function parseValue(v) {
+	        if (utils.isDate(v)) {
+	          v = v.toISOString();
+	        } else if (utils.isObject(v)) {
+	          v = JSON.stringify(v);
+	        }
+	        parts.push(encode(key) + '=' + encode(v));
+	      });
+	    });
+	
+	    serializedParams = parts.join('&');
+	  }
+	
+	  if (serializedParams) {
+	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+	  }
+	
+	  return url;
+	};
+	
+
+
+/***/ },
+/* 26 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	/**
+	 * Parse headers into an object
+	 *
+	 * ```
+	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
+	 * Content-Type: application/json
+	 * Connection: keep-alive
+	 * Transfer-Encoding: chunked
+	 * ```
+	 *
+	 * @param {String} headers Headers needing to be parsed
+	 * @returns {Object} Headers parsed into an object
+	 */
+	module.exports = function parseHeaders(headers) {
+	  var parsed = {};
+	  var key;
+	  var val;
+	  var i;
+	
+	  if (!headers) { return parsed; }
+	
+	  utils.forEach(headers.split('\n'), function parser(line) {
+	    i = line.indexOf(':');
+	    key = utils.trim(line.substr(0, i)).toLowerCase();
+	    val = utils.trim(line.substr(i + 1));
+	
+	    if (key) {
+	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+	    }
+	  });
+	
+	  return parsed;
+	};
+
+
+/***/ },
+/* 27 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	/**
+	 * Transform the data for a request or a response
+	 *
+	 * @param {Object|String} data The data to be transformed
+	 * @param {Array} headers The headers for the request or response
+	 * @param {Array|Function} fns A single function or Array of functions
+	 * @returns {*} The resulting transformed data
+	 */
+	module.exports = function transformData(data, headers, fns) {
+	  /*eslint no-param-reassign:0*/
+	  utils.forEach(fns, function transform(fn) {
+	    data = fn(data, headers);
+	  });
+	
+	  return data;
+	};
+
+
+/***/ },
+/* 28 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs have full support of the APIs needed to test
+	  // whether the request URL is of the same origin as current location.
+	  (function standardBrowserEnv() {
+	    var msie = /(msie|trident)/i.test(navigator.userAgent);
+	    var urlParsingNode = document.createElement('a');
+	    var originURL;
+	
+	    /**
+	    * Parse a URL to discover it's components
+	    *
+	    * @param {String} url The URL to be parsed
+	    * @returns {Object}
+	    */
+	    function resolveURL(url) {
+	      var href = url;
+	
+	      if (msie) {
+	        // IE needs attribute set twice to normalize properties
+	        urlParsingNode.setAttribute('href', href);
+	        href = urlParsingNode.href;
+	      }
+	
+	      urlParsingNode.setAttribute('href', href);
+	
+	      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+	      return {
+	        href: urlParsingNode.href,
+	        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+	        host: urlParsingNode.host,
+	        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+	        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+	        hostname: urlParsingNode.hostname,
+	        port: urlParsingNode.port,
+	        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+	                  urlParsingNode.pathname :
+	                  '/' + urlParsingNode.pathname
+	      };
+	    }
+	
+	    originURL = resolveURL(window.location.href);
+	
+	    /**
+	    * Determine if a URL shares the same origin as the current location
+	    *
+	    * @param {String} requestURL The URL to test
+	    * @returns {boolean} True if URL shares the same origin, otherwise false
+	    */
+	    return function isURLSameOrigin(requestURL) {
+	      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+	      return (parsed.protocol === originURL.protocol &&
+	            parsed.host === originURL.host);
+	    };
+	  })() :
+	
+	  // Non standard browser envs (web workers, react-native) lack needed support.
+	  (function nonStandardBrowserEnv() {
+	    return function isURLSameOrigin() {
+	      return true;
+	    };
+	  })()
+	);
+
+
+/***/ },
+/* 29 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
+	
+	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+	
+	function E() {
+	  this.message = 'String contains an invalid character';
+	}
+	E.prototype = new Error;
+	E.prototype.code = 5;
+	E.prototype.name = 'InvalidCharacterError';
+	
+	function btoa(input) {
+	  var str = String(input);
+	  var output = '';
+	  for (
+	    // initialize result and counter
+	    var block, charCode, idx = 0, map = chars;
+	    // if the next str index does not exist:
+	    //   change the mapping table to "="
+	    //   check if d has no fractional digits
+	    str.charAt(idx | 0) || (map = '=', idx % 1);
+	    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+	    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+	  ) {
+	    charCode = str.charCodeAt(idx += 3 / 4);
+	    if (charCode > 0xFF) {
+	      throw new E();
+	    }
+	    block = block << 8 | charCode;
+	  }
+	  return output;
+	}
+	
+	module.exports = btoa;
+
+
+/***/ },
+/* 30 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Resolve or reject a Promise based on response status.
+	 *
+	 * @param {Function} resolve A function that resolves the promise.
+	 * @param {Function} reject A function that rejects the promise.
+	 * @param {object} response The response.
+	 */
+	module.exports = function settle(resolve, reject, response) {
+	  var validateStatus = response.config.validateStatus;
+	  // Note: status is not exposed by XDomainRequest
+	  if (!response.status || !validateStatus || validateStatus(response.status)) {
+	    resolve(response);
+	  } else {
+	    reject(response);
+	  }
+	};
+
+
+/***/ },
+/* 31 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs support document.cookie
+	  (function standardBrowserEnv() {
+	    return {
+	      write: function write(name, value, expires, path, domain, secure) {
+	        var cookie = [];
+	        cookie.push(name + '=' + encodeURIComponent(value));
+	
+	        if (utils.isNumber(expires)) {
+	          cookie.push('expires=' + new Date(expires).toGMTString());
+	        }
+	
+	        if (utils.isString(path)) {
+	          cookie.push('path=' + path);
+	        }
+	
+	        if (utils.isString(domain)) {
+	          cookie.push('domain=' + domain);
+	        }
+	
+	        if (secure === true) {
+	          cookie.push('secure');
+	        }
+	
+	        document.cookie = cookie.join('; ');
+	      },
+	
+	      read: function read(name) {
+	        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+	        return (match ? decodeURIComponent(match[3]) : null);
+	      },
+	
+	      remove: function remove(name) {
+	        this.write(name, '', Date.now() - 86400000);
+	      }
+	    };
+	  })() :
+	
+	  // Non standard browser env (web workers, react-native) lack needed support.
+	  (function nonStandardBrowserEnv() {
+	    return {
+	      write: function write() {},
+	      read: function read() { return null; },
+	      remove: function remove() {}
+	    };
+	  })()
+	);
+
+
+/***/ },
+/* 32 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(22);
+	
+	function InterceptorManager() {
+	  this.handlers = [];
+	}
+	
+	/**
+	 * Add a new interceptor to the stack
+	 *
+	 * @param {Function} fulfilled The function to handle `then` for a `Promise`
+	 * @param {Function} rejected The function to handle `reject` for a `Promise`
+	 *
+	 * @return {Number} An ID used to remove interceptor later
+	 */
+	InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+	  this.handlers.push({
+	    fulfilled: fulfilled,
+	    rejected: rejected
+	  });
+	  return this.handlers.length - 1;
+	};
+	
+	/**
+	 * Remove an interceptor from the stack
+	 *
+	 * @param {Number} id The ID that was returned by `use`
+	 */
+	InterceptorManager.prototype.eject = function eject(id) {
+	  if (this.handlers[id]) {
+	    this.handlers[id] = null;
+	  }
+	};
+	
+	/**
+	 * Iterate over all the registered interceptors
+	 *
+	 * This method is particularly useful for skipping over any
+	 * interceptors that may have become `null` calling `eject`.
+	 *
+	 * @param {Function} fn The function to call for each interceptor
+	 */
+	InterceptorManager.prototype.forEach = function forEach(fn) {
+	  utils.forEach(this.handlers, function forEachHandler(h) {
+	    if (h !== null) {
+	      fn(h);
+	    }
+	  });
+	};
+	
+	module.exports = InterceptorManager;
+
+
+/***/ },
+/* 33 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Determines whether the specified URL is absolute
+	 *
+	 * @param {string} url The URL to test
+	 * @returns {boolean} True if the specified URL is absolute, otherwise false
+	 */
+	module.exports = function isAbsoluteURL(url) {
+	  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+	  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+	  // by any combination of letters, digits, plus, period, or hyphen.
+	  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+	};
+
+
+/***/ },
+/* 34 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Creates a new URL by combining the specified URLs
+	 *
+	 * @param {string} baseURL The base URL
+	 * @param {string} relativeURL The relative URL
+	 * @returns {string} The combined URL
+	 */
+	module.exports = function combineURLs(baseURL, relativeURL) {
+	  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
+	};
+
+
+/***/ },
+/* 35 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function bind(fn, thisArg) {
+	  return function wrap() {
+	    var args = new Array(arguments.length);
+	    for (var i = 0; i < args.length; i++) {
+	      args[i] = arguments[i];
+	    }
+	    return fn.apply(thisArg, args);
+	  };
+	};
+
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Syntactic sugar for invoking a function and expanding an array for arguments.
+	 *
+	 * Common use case would be to use `Function.prototype.apply`.
+	 *
+	 *  ```js
+	 *  function f(x, y, z) {}
+	 *  var args = [1, 2, 3];
+	 *  f.apply(null, args);
+	 *  ```
+	 *
+	 * With `spread` this example can be re-written.
+	 *
+	 *  ```js
+	 *  spread(function(x, y, z) {})([1, 2, 3]);
+	 *  ```
+	 *
+	 * @param {Function} callback
+	 * @returns {Function}
+	 */
+	module.exports = function spread(callback) {
+	  return function wrap(arr) {
+	    return callback.apply(null, arr);
+	  };
+	};
+
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var getCurrentUser = exports.getCurrentUser = function getCurrentUser(state) {
+	  return state.currentUser;
+	};
+	var getUsers = exports.getUsers = function getUsers(state) {
+	  return state.users;
+	};
+	var getConsumptions = exports.getConsumptions = function getConsumptions(state) {
+	  return state.consumptions;
+	};
+	var getConsumables = exports.getConsumables = function getConsumables(state) {
+	  return state.consumables;
+	};
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(39)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/UserEditor.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(40)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-d1553dac/UserEditor.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _actions = __webpack_require__(18);
+	
+	var _underscore = __webpack_require__(10);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    vuex: {
+	        actions: {
+	            editUser: _actions.editUser,
+	            fetchUsers: _actions.fetchUsers,
+	            deleteUserRole: _actions.deleteUserRole,
+	            createUserRole: _actions.createUserRole
+	        }
+	    },
+	    data: function data() {
+	        return {
+	            error: false,
+	            errorMessage: '',
+	            id: '',
+	            name: '',
+	            email: '',
+	            human: false,
+	            selectedRole: 'sixpackadmin'
+	        };
+	    },
+	    ready: function ready() {
+	        this.loadUser();
+	    },
+	
+	    methods: {
+	        doEdit: function doEdit() {
+	            var notifyClose = this.notifyClose;
+	            var setError = this.setError;
+	            this.editUser({ id: this.id, name: this.name, email: this.email, human: this.human }).then(function (success) {
+	                if (success) {
+	                    notifyClose();
+	                } else {
+	                    setError('Error editing user.');
+	                }
+	            });
+	        },
+	        loadUser: function loadUser() {
+	            this.id = this.user.id;
+	            this.name = this.user.name;
+	            this.email = this.user.email;
+	            this.human = this.user.human;
+	        },
+	        doDeleteUserRole: function doDeleteUserRole(event) {
+	            var setError = this.setError;
+	            var fetchUsers = this.fetchUsers;
+	            this.deleteUserRole(this.user.userroles[+event.target.getAttribute('index')]).then(function (success) {
+	                if (success) {
+	                    fetchUsers();
+	                } else {
+	                    setError('Error deleting userrole');
+	                }
+	            });
+	        },
+	        doAddUserRole: function doAddUserRole() {
+	            var setError = this.setError;
+	            var fetchUsers = this.fetchUsers;
+	
+	            if (_underscore2.default.indexOf(_underscore2.default.pluck(this.user.userroles, 'roleId'), this.selectedRole) === -1) {
+	                this.createUserRole(this.id, this.selectedRole).then(function (success) {
+	                    if (success) {
+	                        fetchUsers();
+	                    } else {
+	                        setError('Error deleting userrole');
+	                    }
+	                });
+	            }
+	        },
+	        setError: function setError(errorMessage) {
+	            this.error = true;
+	            this.errorMessage = errorMessage;
+	        },
+	        notifyClose: function notifyClose() {
+	            this.$dispatch('editorClose');
+	        }
+	    },
+	    props: ['user']
+	
+	};
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n         <p class=\"card-header-title\">\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
+
+/***/ },
+/* 41 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(42)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/UserCreator.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(43)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-f470b482/UserCreator.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _getters = __webpack_require__(37);
+	
+	var _actions = __webpack_require__(18);
+	
+	exports.default = {
+	    vuex: {
+	        actions: {
+	            createUser: _actions.createUser
+	        }
+	    },
+	    data: function data() {
+	        return {
+	            error: false,
+	            name: '',
+	            email: '',
+	            password: '',
+	            beerAdmin: false,
+	            admin: false,
+	            human: false
+	        };
+	    },
+	
+	    methods: {
+	        onCreate: function onCreate() {
+	            var notifyClose = this.notifyClose;
+	            var setError = this.setError;
+	            this.createUser({
+	                name: this.name, email: this.email, password: this.password, human: this.human,
+	                admin: this.admin, beerAdmin: this.beerAdmin
+	            }).then(function (success) {
+	                if (success) {
+	                    notifyClose();
+	                } else {
+	                    setError();
+	                }
+	            });
+	        },
+	        setError: function setError() {
+	            this.error = true;
+	        },
+	        notifyClose: function notifyClose() {
+	            this.$dispatch('creatorClose');
+	        }
+	    }
+	
+	};
+
+/***/ },
+/* 43 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            Create user\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"admin\">Admin?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"beerAdmin\">Beer Admin?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"onCreate\">Save</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error creating user\n        </div>\n    </div>\n\n</div>\n";
+
+/***/ },
+/* 44 */
+/***/ function(module, exports) {
+
+	module.exports = "\n\n<div class=\"modal is-active\" v-if=\"editorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-editor v-bind:user=\"users[selectedUser]\"></user-editor>\n        </div>\n    </div>\n    <button v-on:click=\"hideEditor\" class=\"modal-close\"></button>\n</div>\n\n<div class=\"modal is-active\" v-if=\"creatorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-creator></user-creator>\n        </div>\n    </div>\n    <button v-on:click=\"hideCreator\" class=\"modal-close\"></button>\n</div>\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><button v-on:click=\"onCreate\" class=\"button control\">Add user</button></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\" track-by=\"id\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button v-on:click=\"onEdit\" class=\"button is-primary control\" v-bind:index=\"$index\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
+
+/***/ },
+/* 45 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_template__ = __webpack_require__(46)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-afaf1ed2/AdminDashboard.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 46 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumptions'}\">\n                        Consumptions\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumables'}\">\n                        Consumables\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
+
+/***/ },
+/* 47 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(48)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/ConsumptionManager.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(49)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-4fe144a4/ConsumptionManager.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 48 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _actions = __webpack_require__(18);
+	
+	var _getters = __webpack_require__(37);
+	
+	var _underscore = __webpack_require__(10);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    ready: function ready() {
+	        this.fetchUsers();
+	        this.fetchConsumables();
+	        this.fetchConsumptions();
+	    },
+	
+	    vuex: {
+	        actions: {
+	            fetchConsumptions: _actions.fetchConsumptions,
+	            fetchConsumables: _actions.fetchConsumables,
+	            fetchUsers: _actions.fetchUsers
+	        },
+	        getters: {
+	            consumptions: _getters.getConsumptions
+	        }
+	    },
+	    methods: {
+	        onCreate: function onCreate(event) {},
+	        onDelete: function onDelete(event) {
+	            var fetchUsers = this.fetchUsers;
+	            this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function (success) {
+	                if (success) {
+	                    fetchUsers();
+	                }
+	            });
+	        }
+	    }
+	};
+
+/***/ },
+/* 49 */
+/***/ function(module, exports) {
+
+	module.exports = "\n\n<table class=\"table\">\n    <thead>\n    <tr>\n        <th>Username</th>\n        <th>User ID</th>\n        <th>Consumable</th>\n        <th>Amount</th>\n        <th><button v-on:click=\"onCreate\" class=\"button control\">Add consumption</button></th>\n        <th><button v-on:click=\"fetchConsumptions\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr v-for=\"consumption in consumptions\" track-by=\"id\">\n        <td></td>\n        <td>{{ consumption.userId }}</td>\n        <td>{{ consumption.consumableId }}</td>\n        <td></td>\n        <td>\n            <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n        </td>\n    </tr>\n    </tbody>\n</table>\n\n\n\n";
+
+/***/ },
+/* 50 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(51)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/ConsumablesManager.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(52)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-41db22af/ConsumablesManager.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _actions = __webpack_require__(18);
+	
+	var _getters = __webpack_require__(37);
+	
+	var _underscore = __webpack_require__(10);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    ready: function ready() {
+	        this.fetchConsumables();
+	    },
+	    data: function data() {
+	        return {
+	            name: '',
+	            description: ''
+	        };
+	    },
+	
+	    vuex: {
+	        actions: {
+	            fetchConsumables: _actions.fetchConsumables,
+	            createConsumable: _actions.createConsumable
+	
+	        },
+	        getters: {
+	            consumables: _getters.getConsumables
+	        }
+	    },
+	    methods: {
+	        onCreate: function onCreate(event) {
+	            console.log(this.name);
+	            console.log(this.description);
+	            var setError = this.setError;
+	            var fetchConsumables = this.fetchConsumables;
+	            this.createConsumable(this.name, this.description).then(function (success) {
+	                if (success) {
+	                    fetchConsumables();
+	                } else {
+	                    setError();
+	                }
+	            });
+	        },
+	        setError: function setError() {
+	            this.error = true;
+	        },
+	
+	        onDelete: function onDelete(event) {
+	            var fetchUsers = this.fetchUsers;
+	            this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function (success) {
+	                if (success) {
+	                    fetchUsers();
+	                }
+	            });
+	        }
+	    }
+	};
+
+/***/ },
+/* 52 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"control is-grouped\">\n    <label class=\"control-label\">\n        Name\n    </label>\n    <input class=\"input control\" type=\"text\" v-model=\"name\">\n    <label class=\"control-label\">\n        Description\n    </label>\n    <input class=\"input control\" type=\"text\" v-model=\"description\">\n    <p>\n        <button class=\"button\" @click=\"onCreate\">Create</button>\n    </p>\n</div>\n<div class=\"notification is-danger\" v-if=\"error\">\n    Error creating consumable\n</div>\n<table class=\"table\">\n    <thead>\n    <tr>\n        <th>ID</th>\n        <th>Name</th>\n        <th>Description</th>\n        <th><button v-on:click=\"onCreate\" class=\"button control\">Add consumable</button></th>\n        <th><button v-on:click=\"fetchConsumables\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr v-for=\"consumable in consumables\" track-by=\"id\">\n        <td>{{ consumable.id }}</td>\n        <td>{{ consumable.name }}</td>\n        <td>{{ consumable.description }}</td>\n        <td>\n            <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n        </td>\n    </tr>\n    </tbody>\n</table>\n\n\n\n";
 
 /***/ }
 /******/ ]);

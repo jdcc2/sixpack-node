@@ -5,6 +5,8 @@ import Vuex from 'vuex'
 import _ from 'underscore'
 import App from './components/App.vue'
 import UserManager from './components/admin/UserManager.vue'
+import ConsumptionManager from './components/admin/ConsumptionManager.vue'
+import ConsumablesManager from './components/admin/ConsumablesManager.vue'
 import AdminDashboard from './components/admin/AdminDashboard.vue'
 
 Vue.use(VueRouter);
@@ -23,11 +25,17 @@ router.map({
        subRoutes: {
            '/': {
                component: {
-                   template: '<h1>Admin Dashboard. Use the menu o nthe right.</h1>'
+                   template: '<h1>Admin Dashboard. Use the menu on the right.</h1>'
                }
            },
            '/users': {
                component: UserManager
+           },
+           '/consumptions': {
+               component: ConsumptionManager
+           },
+           '/consumables': {
+               component: ConsumablesManager
            }
 
        }

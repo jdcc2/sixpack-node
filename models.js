@@ -236,14 +236,14 @@ var models = {
         //These foreign keys are created by the function calls below, but constraints on uniqueness are set here
         userId: {
             type: Sequelize.INTEGER,
-            unique: true,
+            unique: 'userrolecomp',
             allowNull: false
         },
         roleId: {
             type: Sequelize.STRING,
-            uniwue: true,
+            unique: 'userrolecomp',
             allowNull: false
-        },
+        }
 
     }),
     GoogleProfile: sequelize.define('googleprofile', {
