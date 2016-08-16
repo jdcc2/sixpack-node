@@ -16,13 +16,13 @@
             <div class="nav-left">
                 <span style="width: 20px;"></span>
                 <h1 class="title has-text-centered is-brand">
-                    Hello, {{ currentUser.hasOwnProperty('name') ? currentUser.name : ''}}
+                    Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}
                 </h1>
 
             </div>
             <div class="nav-right nav-menu">
                 <a class="nav-item is-tab" v-link="{path: '/', exact: true}">Home</a>
-                <a class="nav-item is-tab" v-link="{path: '/admin'}">Admin</a>
+                <a class="nav-item is-tab" v-if="admin" v-link="{path: '/admin'}">Admin</a>
                 <a class="nav-item" href="/auth/logout">Logout</a>
                 <span></span>
             </div>
@@ -48,7 +48,8 @@
                 fetchCurrentUser
             },
             getters: {
-                currentUser : getCurrentUser
+                currentUser : getCurrentUser,
+                admin: function(state) {return state.admin;}
             }
         },
         created() {

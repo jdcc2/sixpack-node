@@ -61,7 +61,7 @@ UserController.prototype.getAll = function(req, res, next) {
         _.each(resources, function(value) {
             resourcesObject[value.id] = value;
         });
-        res.json(new Response(resourcesObject));
+        res.json(new Response(resources));
     }).catch(function(err) {
         next(err);
     });
@@ -108,7 +108,7 @@ UserController.prototype.get = function(req, res, next) {
 UserController.prototype.getCurrent = function (req, res, next) {
     var model = this.model;
     var prepReturn = this.prepReturn.bind(this);
-    this.authorize('get', req.user, req.params.id).then(function() {
+    this.authorize('get', req.user, req.user.id).then(function() {
         return model.findById(req.user.id, { include: [{ all: true, nested: true }]});
     }).then(function(resource){
         if(resource) {

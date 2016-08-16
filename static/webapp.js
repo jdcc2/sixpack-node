@@ -77,7 +77,7 @@
 	
 	var _App2 = _interopRequireDefault(_App);
 	
-	var _UserManager = __webpack_require__(16);
+	var _UserManager = __webpack_require__(36);
 	
 	var _UserManager2 = _interopRequireDefault(_UserManager);
 	
@@ -15646,7 +15646,7 @@
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/App.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(15)
+	__vue_template__ = __webpack_require__(35)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -15678,9 +15678,9 @@
 	
 	var _store2 = _interopRequireDefault(_store);
 	
-	var _actions = __webpack_require__(18);
+	var _actions = __webpack_require__(15);
 	
-	var _getters = __webpack_require__(37);
+	var _getters = __webpack_require__(34);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15690,7 +15690,10 @@
 	            fetchCurrentUser: _actions.fetchCurrentUser
 	        },
 	        getters: {
-	            currentUser: _getters.getCurrentUser
+	            currentUser: _getters.getCurrentUser,
+	            admin: function admin(state) {
+	                return state.admin;
+	            }
 	        }
 	    },
 	    created: function created() {
@@ -15741,13 +15744,6 @@
 	};
 	
 	var mutations = {
-	    LOGIN: function LOGIN(state, admin, user_id, user, jwt) {
-	        state.currentUser.authenticated = true;
-	        state.currentUser.admin = admin;
-	        state.currentUser.user_id = user_id;
-	        state.currentUser.user = user;
-	        state.currentUser.jwt = jwt;
-	    },
 	    CURRENTUSER: function CURRENTUSER(state, user) {
 	        state.currentUser = user;
 	    },
@@ -15840,129 +15836,6 @@
 
 /***/ },
 /* 15 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(17)
-	if (__vue_script__ &&
-	    __vue_script__.__esModule &&
-	    Object.keys(__vue_script__).length > 1) {
-	  console.warn("[vue-loader] webapp/components/admin/UserManager.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(44)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-d906e680/UserManager.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	
-	var _actions = __webpack_require__(18);
-	
-	var _getters = __webpack_require__(37);
-	
-	var _UserEditor = __webpack_require__(38);
-	
-	var _UserEditor2 = _interopRequireDefault(_UserEditor);
-	
-	var _UserCreator = __webpack_require__(41);
-	
-	var _UserCreator2 = _interopRequireDefault(_UserCreator);
-	
-	var _underscore = __webpack_require__(10);
-	
-	var _underscore2 = _interopRequireDefault(_underscore);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	exports.default = {
-	    data: function data() {
-	        console.log(_underscore2.default.pluck([{ "name": "peter" }], 'name'));
-	        return {
-	            selectedUser: 0,
-	            editorVisible: false,
-	            creatorVisible: false
-	        };
-	    },
-	    ready: function ready() {
-	        this.fetchUsers();
-	    },
-	
-	    vuex: {
-	        actions: {
-	            fetchUsers: _actions.fetchUsers,
-	            deleteUser: _actions.deleteUser
-	        },
-	        getters: {
-	            users: _getters.getUsers
-	        }
-	    },
-	    components: {
-	        UserEditor: _UserEditor2.default,
-	        UserCreator: _UserCreator2.default
-	    },
-	    methods: {
-	        onEdit: function onEdit(event) {
-	            this.selectedUser = +event.target.getAttribute('key');
-	            this.editorVisible = true;
-	        },
-	        onCreate: function onCreate(event) {
-	            this.creatorVisible = true;
-	        },
-	        hideEditor: function hideEditor() {
-	            this.editorVisible = false;
-	        },
-	        hideCreator: function hideCreator() {
-	            this.creatorVisible = false;
-	        },
-	        onDelete: function onDelete(event) {
-	            var fetchUsers = this.fetchUsers;
-	            this.deleteUser(this.users[+event.target.getAttribute('key')]).then(function (success) {
-	                if (success) {
-	                    fetchUsers();
-	                }
-	            });
-	        }
-	    },
-	    events: {
-	        'editorClose': function editorClose() {
-	            this.hideEditor();
-	            this.fetchUsers();
-	        },
-	        'creatorClose': function creatorClose() {
-	            this.hideCreator();
-	            this.fetchUsers();
-	        }
-	    }
-	};
-
-/***/ },
-/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -15972,7 +15845,7 @@
 	});
 	exports.createConsumption = exports.deleteConsumption = exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.fetchCurrentUser = exports.showMessage = undefined;
 	
-	var _axios = __webpack_require__(19);
+	var _axios = __webpack_require__(16);
 	
 	var _axios2 = _interopRequireDefault(_axios);
 	
@@ -16482,25 +16355,25 @@
 	};
 
 /***/ },
-/* 19 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(20);
+	module.exports = __webpack_require__(17);
 
 /***/ },
-/* 20 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(21);
-	var utils = __webpack_require__(22);
-	var dispatchRequest = __webpack_require__(23);
-	var InterceptorManager = __webpack_require__(32);
-	var isAbsoluteURL = __webpack_require__(33);
-	var combineURLs = __webpack_require__(34);
-	var bind = __webpack_require__(35);
-	var transformData = __webpack_require__(27);
+	var defaults = __webpack_require__(18);
+	var utils = __webpack_require__(19);
+	var dispatchRequest = __webpack_require__(20);
+	var InterceptorManager = __webpack_require__(29);
+	var isAbsoluteURL = __webpack_require__(30);
+	var combineURLs = __webpack_require__(31);
+	var bind = __webpack_require__(32);
+	var transformData = __webpack_require__(24);
 	
 	function Axios(defaultConfig) {
 	  this.defaults = utils.merge({}, defaultConfig);
@@ -16586,7 +16459,7 @@
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(36);
+	axios.spread = __webpack_require__(33);
 	
 	// Provide aliases for supported request methods
 	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
@@ -16614,12 +16487,12 @@
 
 
 /***/ },
-/* 21 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -16686,7 +16559,7 @@
 
 
 /***/ },
-/* 22 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -16958,7 +16831,7 @@
 
 
 /***/ },
-/* 23 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -16980,10 +16853,10 @@
 	        adapter = config.adapter;
 	      } else if (typeof XMLHttpRequest !== 'undefined') {
 	        // For browsers use XHR adapter
-	        adapter = __webpack_require__(24);
+	        adapter = __webpack_require__(21);
 	      } else if (typeof process !== 'undefined') {
 	        // For node use HTTP adapter
-	        adapter = __webpack_require__(24);
+	        adapter = __webpack_require__(21);
 	      }
 	
 	      if (typeof adapter === 'function') {
@@ -16999,18 +16872,18 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 24 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(22);
-	var buildURL = __webpack_require__(25);
-	var parseHeaders = __webpack_require__(26);
-	var transformData = __webpack_require__(27);
-	var isURLSameOrigin = __webpack_require__(28);
-	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(29);
-	var settle = __webpack_require__(30);
+	var utils = __webpack_require__(19);
+	var buildURL = __webpack_require__(22);
+	var parseHeaders = __webpack_require__(23);
+	var transformData = __webpack_require__(24);
+	var isURLSameOrigin = __webpack_require__(25);
+	var btoa = (typeof window !== 'undefined' && window.btoa) || __webpack_require__(26);
+	var settle = __webpack_require__(27);
 	
 	module.exports = function xhrAdapter(resolve, reject, config) {
 	  var requestData = config.data;
@@ -17107,7 +16980,7 @@
 	  // This is only done if running in a standard browser environment.
 	  // Specifically not if we're in a web worker, or react-native.
 	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(31);
+	    var cookies = __webpack_require__(28);
 	
 	    // Add xsrf header
 	    var xsrfValue = config.withCredentials || isURLSameOrigin(config.url) ?
@@ -17168,12 +17041,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ },
-/* 25 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -17241,12 +17114,12 @@
 
 
 /***/ },
-/* 26 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	/**
 	 * Parse headers into an object
@@ -17284,12 +17157,12 @@
 
 
 /***/ },
-/* 27 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -17310,12 +17183,12 @@
 
 
 /***/ },
-/* 28 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -17384,7 +17257,7 @@
 
 
 /***/ },
-/* 29 */
+/* 26 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17426,7 +17299,7 @@
 
 
 /***/ },
-/* 30 */
+/* 27 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17450,12 +17323,12 @@
 
 
 /***/ },
-/* 31 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -17509,12 +17382,12 @@
 
 
 /***/ },
-/* 32 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(22);
+	var utils = __webpack_require__(19);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -17567,7 +17440,7 @@
 
 
 /***/ },
-/* 33 */
+/* 30 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17587,7 +17460,7 @@
 
 
 /***/ },
-/* 34 */
+/* 31 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17605,7 +17478,7 @@
 
 
 /***/ },
-/* 35 */
+/* 32 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17622,7 +17495,7 @@
 
 
 /***/ },
-/* 36 */
+/* 33 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -17655,7 +17528,7 @@
 
 
 /***/ },
-/* 37 */
+/* 34 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -17674,6 +17547,129 @@
 	};
 	var getConsumables = exports.getConsumables = function getConsumables(state) {
 	  return state.consumables;
+	};
+
+/***/ },
+/* 35 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(37)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/UserManager.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(44)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-d906e680/UserManager.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _actions = __webpack_require__(15);
+	
+	var _getters = __webpack_require__(34);
+	
+	var _UserEditor = __webpack_require__(38);
+	
+	var _UserEditor2 = _interopRequireDefault(_UserEditor);
+	
+	var _UserCreator = __webpack_require__(41);
+	
+	var _UserCreator2 = _interopRequireDefault(_UserCreator);
+	
+	var _underscore = __webpack_require__(10);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    data: function data() {
+	        console.log(_underscore2.default.pluck([{ "name": "peter" }], 'name'));
+	        return {
+	            selectedUser: 0,
+	            editorVisible: false,
+	            creatorVisible: false
+	        };
+	    },
+	    ready: function ready() {
+	        this.fetchUsers();
+	    },
+	
+	    vuex: {
+	        actions: {
+	            fetchUsers: _actions.fetchUsers,
+	            deleteUser: _actions.deleteUser
+	        },
+	        getters: {
+	            users: _getters.getUsers
+	        }
+	    },
+	    components: {
+	        UserEditor: _UserEditor2.default,
+	        UserCreator: _UserCreator2.default
+	    },
+	    methods: {
+	        onEdit: function onEdit(event) {
+	            this.selectedUser = +event.target.getAttribute('key');
+	            this.editorVisible = true;
+	        },
+	        onCreate: function onCreate(event) {
+	            this.creatorVisible = true;
+	        },
+	        hideEditor: function hideEditor() {
+	            this.editorVisible = false;
+	        },
+	        hideCreator: function hideCreator() {
+	            this.creatorVisible = false;
+	        },
+	        onDelete: function onDelete(event) {
+	            var fetchUsers = this.fetchUsers;
+	            this.deleteUser(this.users[+event.target.getAttribute('key')]).then(function (success) {
+	                if (success) {
+	                    fetchUsers();
+	                }
+	            });
+	        }
+	    },
+	    events: {
+	        'editorClose': function editorClose() {
+	            this.hideEditor();
+	            this.fetchUsers();
+	        },
+	        'creatorClose': function creatorClose() {
+	            this.hideCreator();
+	            this.fetchUsers();
+	        }
+	    }
 	};
 
 /***/ },
@@ -17714,9 +17710,9 @@
 	    value: true
 	});
 	
-	var _actions = __webpack_require__(18);
+	var _actions = __webpack_require__(15);
 	
-	var _getters = __webpack_require__(37);
+	var _getters = __webpack_require__(34);
 	
 	var _underscore = __webpack_require__(10);
 	
@@ -17856,9 +17852,9 @@
 	    value: true
 	});
 	
-	var _getters = __webpack_require__(37);
+	var _getters = __webpack_require__(34);
 	
-	var _actions = __webpack_require__(18);
+	var _actions = __webpack_require__(15);
 	
 	exports.default = {
 	    vuex: {
@@ -17953,9 +17949,9 @@
 	    value: true
 	});
 	
-	var _actions = __webpack_require__(18);
+	var _actions = __webpack_require__(15);
 	
-	var _getters = __webpack_require__(37);
+	var _getters = __webpack_require__(34);
 	
 	var _underscore = __webpack_require__(10);
 	
@@ -18070,9 +18066,9 @@
 	    value: true
 	});
 	
-	var _actions = __webpack_require__(18);
+	var _actions = __webpack_require__(15);
 	
-	var _getters = __webpack_require__(37);
+	var _getters = __webpack_require__(34);
 	
 	var _underscore = __webpack_require__(10);
 	
@@ -18143,6 +18139,11 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(53)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/admin/AdminDashboard.vue: named exports in *.vue files are ignored.")}
 	__vue_template__ = __webpack_require__(52)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
@@ -18166,6 +18167,37 @@
 /***/ function(module, exports) {
 
 	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumptions'}\">\n                        Consumptions\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumables'}\">\n                        Consumables\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
+
+/***/ },
+/* 53 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = {
+	    vuex: {
+	        getters: {
+	            admin: function admin(state) {
+	                return state.admin;
+	            }
+	        }
+	    },
+	
+	    route: {
+	        activate: function activate(transition) {
+	            console.log('admin activated');
+	            if (this.admin === true) {
+	                transition.next();
+	            } else {
+	                transition.abort();
+	                console.log('admin ui aborted');
+	            }
+	        }
+	    }
+	};
 
 /***/ }
 /******/ ]);

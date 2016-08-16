@@ -20,13 +20,6 @@ const state = {
 };
 
 const mutations = {
-    LOGIN (state, admin, user_id, user, jwt) {
-        state.currentUser.authenticated = true;
-        state.currentUser.admin = admin;
-        state.currentUser.user_id = user_id;
-        state.currentUser.user = user;
-        state.currentUser.jwt = jwt;
-    },
     CURRENTUSER (state, user) {
         state.currentUser = user;
     },
