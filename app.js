@@ -151,8 +151,8 @@ sequelize.authenticate().then(function() {
 }).then(function() {
     //make sure the admin account exists
     console.log('Creating admin account...')
-    return models.User.findOrCreate({where: {id: 1, name: "admin", email: 'admin@admin.com'},
-        defaults: { userroles: [{userId: 1, roleId: 'sixpackadmin'}], localprofile: {password: 'admin'}},
+    return models.User.findOrCreate({where: {id: 1},
+        defaults: { name: 'admin', email: 'admin@admin.com', userroles: [{userId: 1, roleId: 'sixpackadmin'}], localprofile: {password: 'admin'}},
         include: [models.UserRole, models.LocalProfile]});
 }).catch(function(err) {
     console.log('Error accessing database');

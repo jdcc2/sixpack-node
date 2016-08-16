@@ -8,13 +8,15 @@ Vue.use(Vuex);
 const state = {
     currentUser: null,
     authenticated : true,
+    admin: false,
+    beeradmin: false,
     config: {
         api_url : 'http://localhost:3000/api'
         //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
     },
-    users: [],
-    consumptions: [],
-    consumables: []
+    users: {},
+    consumptions: {},
+    consumables: {}
 };
 
 const mutations = {
@@ -27,6 +29,12 @@ const mutations = {
     },
     CURRENTUSER (state, user) {
         state.currentUser = user;
+    },
+    ADMIN (state, value) {
+        state.admin = value;
+    },
+    BEERADMIN (state, value) {
+        state.beeradmin = value;
     },
     USERS (state, users) {
         state.users = users;

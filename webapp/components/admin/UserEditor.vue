@@ -48,6 +48,7 @@
 
 <script>
     import {editUser, fetchUsers, deleteUserRole, createUserRole} from '../../actions'
+    import {getUsers} from '../../getters'
     import _ from 'underscore'
 
     export default {
@@ -57,6 +58,9 @@
                 fetchUsers,
                 deleteUserRole,
                 createUserRole
+            },
+            getters: {
+                users: getUsers
             }
         },
         data() {
@@ -70,6 +74,11 @@
                 selectedRole: 'sixpackadmin'
             }
 
+        },
+        computed: {
+            user: function() {
+                return this.users[this.userId];
+            }
         },
         //Copy user properties initially so an update of the user list does not destroy the edits
         ready() {
@@ -128,7 +137,7 @@
                 this.$dispatch('editorClose');
             }
         },
-        props : ['user']
+        props : ['userId']
 
 
     }

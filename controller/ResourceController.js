@@ -66,7 +66,11 @@ ResourceController.prototype.getAll = function(req, res, next) {
     }).then(function(resources){
         console.log('getting consumables');
         prepReturn(resources);
-        res.json(new Response(resources));
+        var resourcesObject = {};
+        _.each(resources, function(value) {
+            resourcesObject[value.id] = value;
+        });
+        res.json(new Response(resourcesObject));
     }).catch(function(err) {
         next(err);
     });

@@ -1,5 +1,5 @@
 <template>
-    <div class="control is-grouped">
+    <div class="control is-grouped is-pulled-left is-danger">
         <label class="control-label">
             Name
         </label>
@@ -12,26 +12,25 @@
             <button class="button" @click="onCreate">Create</button>
         </p>
     </div>
-    <div class="notification is-danger" v-if="error">
+    <span class="tag is-danger" v-if="error">
         Error creating consumable
-    </div>
+    </span>
     <table class="table">
         <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Description</th>
-            <th><button v-on:click="onCreate" class="button control">Add consumable</button></th>
             <th><button v-on:click="fetchConsumables" class="button control"><i class="fa fa-refresh" aria-hidden="true"></i></button></th>
         </tr>
         </thead>
         <tbody>
-        <tr v-for="consumable in consumables" track-by="id">
+        <tr v-for="consumable in consumables">
             <td>{{ consumable.id }}</td>
             <td>{{ consumable.name }}</td>
             <td>{{ consumable.description }}</td>
             <td>
-                <button v-on:click="onDelete" class="button is-primary control" v-bind:index="$index">Delete</button>
+                <button v-on:click="onDelete" class="button is-primary control" v-bind:key="$key">Delete</button>
             </td>
         </tr>
         </tbody>
@@ -53,7 +52,8 @@
         data() {
             return {
                 name: '',
-                description: ''
+                description: '',
+                error: false
             }
         },
         vuex: {
@@ -74,14 +74,15 @@
                 let fetchConsumables = this.fetchConsumables;
                 this.createConsumable(this.name, this.description).then(function(success){
                     if(success) {
+                        setError(false);
                         fetchConsumables();
                     } else {
-                        setError();
+                        setError(true);
                     }
                 })
             },
-            setError() {
-                this.error = true;
+            setError(value) {
+                this.error = value;
             },
             onDelete: function(event) {
                 let fetchUsers = this.fetchUsers;

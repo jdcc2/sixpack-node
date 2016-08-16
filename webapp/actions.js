@@ -1,8 +1,52 @@
 "use strict";
 import axios from 'axios'
+import _ from 'underscore'
 
 export const showMessage = function({dispatch, state}) {
 
+};
+
+export const fetchCurrentUser = function({dispatch, state}) {
+    console.log('fetchcurrentusers');
+    axios({
+        method: 'get',
+        url: `${state.config.api_url}/currentuser`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("fetch currentuser returned");
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('fetched current user');
+            dispatch('CURRENTUSER', response.data.data);
+            var currentUserRoles = _.pluck(response.data.data.userroles, 'roleId');
+            if(_.contains(currentUserRoles, 'sixpackadmin')) {
+                dispatch('ADMIN', true);
+            }
+            if(_.contains(currentUserRoles, 'beeradmin')) {
+                dispatch('BEERADMIN', true)
+            }
+        } else {
+            console.log("get current user failed");
+        }
+
+    }).catch((response) => {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed currentuser fetch");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+    });
 };
 
 //TODO Make all update functions return a promise so a fetch can be chained
@@ -354,6 +398,87 @@ export const createConsumable = function({dispatch, state}, name, description) {
             // The request was made, but the server responded with a status code
             // that falls out of the range of 2xx
             console.log("failed create consumable");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+        return false;
+    });
+};
+
+export const deleteConsumption = function({dispatch, state}, consumption) {
+    console.log('consumption delete')
+    return axios({
+        method: 'delete',
+        url: `${state.config.api_url}/consumptions/${consumption.id}`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("consumption delete returned");
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('deleted consumption');
+            return true;
+        } else {
+            console.log("could not delete consumption");
+            return false;
+        }
+        //First element in the items array contains the video data
+        //dispatch(videoFetchComplete(response.data.items[0]))
+
+    }).catch(function(response) {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed consumption delete");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+        return false;
+    });
+};
+
+export const createConsumption = function({dispatch, state}, userId, consumableId, amount) {
+    console.log('consumption create');
+    return axios({
+        method: 'post',
+        url: `${state.config.api_url}/consumptions`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        data : JSON.stringify({userId, consumableId, amount}),
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("create consumptions returned")
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('created consumptions')
+            return true;
+        } else {
+            console.log("could not create consumptions");
+            return false;
+        }
+
+    }).catch(function(response) {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed create consumption");
             console.log(response.data);
             console.log(response.status);
             console.log(response.headers);

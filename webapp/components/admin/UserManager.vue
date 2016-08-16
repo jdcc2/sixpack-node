@@ -4,7 +4,7 @@
         <div class="modal-background"></div>
         <div class="modal-container">
             <div class="modal-content">
-                <user-editor v-bind:user="users[selectedUser]"></user-editor>
+                <user-editor v-bind:user-id="selectedUser"></user-editor>
             </div>
         </div>
         <button v-on:click="hideEditor" class="modal-close"></button>
@@ -32,14 +32,14 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="user in users" track-by="id">
+            <tr v-for="user in users">
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.human }}</td>
                 <td>{{ user.userroles | roles }}</td>
                 <td>
-                    <button v-on:click="onEdit" class="button is-primary control" v-bind:index="$index">Edit</button>
-                    <button v-on:click="onDelete" class="button is-primary control" v-bind:index="$index">Delete</button>
+                    <button v-on:click="onEdit" class="button is-primary control" v-bind:key="$key">Edit</button>
+                    <button v-on:click="onDelete" class="button is-primary control" v-bind:key="$key">Delete</button>
                 </td>
             </tr>
         </tbody>
@@ -83,7 +83,7 @@
         },
         methods: {
             onEdit: function(event) {
-                this.selectedUser = +event.target.getAttribute('index');
+                this.selectedUser = +event.target.getAttribute('key');
                 this.editorVisible = true;
 
             },
@@ -99,7 +99,7 @@
             },
             onDelete: function(event) {
                 let fetchUsers = this.fetchUsers;
-                this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function(success){
+                this.deleteUser(this.users[+event.target.getAttribute('key')]).then(function(success){
                     if(success) {
                         fetchUsers();
                     }

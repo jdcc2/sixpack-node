@@ -193,7 +193,7 @@ var models = {
             allowNull: false,
             validate: {
                 min: 1,
-                max: 10
+                max: 100
             },
             defaultValue: 1
         },

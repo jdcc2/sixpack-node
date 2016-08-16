@@ -17,6 +17,10 @@ Vue.filter('roles', function (userroles) {
     return _.pluck(userroles, 'roleId')
 });
 
+Vue.filter('sortDate', function(objectlist) {
+   return _.sortBy(_.toArray(objectlist), 'createdAt').reverse()
+});
+
 let router = new VueRouter({linkActiveClass: 'is-active'});
 
 router.map({

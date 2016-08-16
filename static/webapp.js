@@ -81,15 +81,15 @@
 	
 	var _UserManager2 = _interopRequireDefault(_UserManager);
 	
-	var _ConsumptionManager = __webpack_require__(47);
+	var _ConsumptionManager = __webpack_require__(45);
 	
 	var _ConsumptionManager2 = _interopRequireDefault(_ConsumptionManager);
 	
-	var _ConsumablesManager = __webpack_require__(50);
+	var _ConsumablesManager = __webpack_require__(48);
 	
 	var _ConsumablesManager2 = _interopRequireDefault(_ConsumablesManager);
 	
-	var _AdminDashboard = __webpack_require__(45);
+	var _AdminDashboard = __webpack_require__(51);
 	
 	var _AdminDashboard2 = _interopRequireDefault(_AdminDashboard);
 	
@@ -101,6 +101,10 @@
 	//Filters
 	_vue2.default.filter('roles', function (userroles) {
 	    return _underscore2.default.pluck(userroles, 'roleId');
+	});
+	
+	_vue2.default.filter('sortDate', function (objectlist) {
+	    return _underscore2.default.sortBy(_underscore2.default.toArray(objectlist), 'createdAt').reverse();
 	});
 	
 	var router = new _vueRouter2.default({ linkActiveClass: 'is-active' });
@@ -15674,9 +15678,25 @@
 	
 	var _store2 = _interopRequireDefault(_store);
 	
+	var _actions = __webpack_require__(18);
+	
+	var _getters = __webpack_require__(37);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
+	    vuex: {
+	        actions: {
+	            fetchCurrentUser: _actions.fetchCurrentUser
+	        },
+	        getters: {
+	            currentUser: _getters.getCurrentUser
+	        }
+	    },
+	    created: function created() {
+	        this.fetchCurrentUser();
+	    },
+	
 	    store: _store2.default
 	};
 
@@ -15709,13 +15729,15 @@
 	var state = {
 	    currentUser: null,
 	    authenticated: true,
+	    admin: false,
+	    beeradmin: false,
 	    config: {
 	        api_url: 'http://localhost:3000/api'
 	        //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
 	    },
-	    users: [],
-	    consumptions: [],
-	    consumables: []
+	    users: {},
+	    consumptions: {},
+	    consumables: {}
 	};
 	
 	var mutations = {
@@ -15728,6 +15750,12 @@
 	    },
 	    CURRENTUSER: function CURRENTUSER(state, user) {
 	        state.currentUser = user;
+	    },
+	    ADMIN: function ADMIN(state, value) {
+	        state.admin = value;
+	    },
+	    BEERADMIN: function BEERADMIN(state, value) {
+	        state.beeradmin = value;
 	    },
 	    USERS: function USERS(state, users) {
 	        state.users = users;
@@ -15814,7 +15842,7 @@
 /* 15 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
+	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
 
 /***/ },
 /* 16 */
@@ -15900,7 +15928,7 @@
 	    },
 	    methods: {
 	        onEdit: function onEdit(event) {
-	            this.selectedUser = +event.target.getAttribute('index');
+	            this.selectedUser = +event.target.getAttribute('key');
 	            this.editorVisible = true;
 	        },
 	        onCreate: function onCreate(event) {
@@ -15914,7 +15942,7 @@
 	        },
 	        onDelete: function onDelete(event) {
 	            var fetchUsers = this.fetchUsers;
-	            this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function (success) {
+	            this.deleteUser(this.users[+event.target.getAttribute('key')]).then(function (success) {
 	                if (success) {
 	                    fetchUsers();
 	                }
@@ -15942,11 +15970,15 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.showMessage = undefined;
+	exports.createConsumption = exports.deleteConsumption = exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.fetchCurrentUser = exports.showMessage = undefined;
 	
 	var _axios = __webpack_require__(19);
 	
 	var _axios2 = _interopRequireDefault(_axios);
+	
+	var _underscore = __webpack_require__(10);
+	
+	var _underscore2 = _interopRequireDefault(_underscore);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -15955,10 +15987,55 @@
 	    var state = _ref.state;
 	};
 	
-	//TODO Make all update functions return a promise so a fetch can be chained
-	var fetchUsers = exports.fetchUsers = function fetchUsers(_ref2) {
+	var fetchCurrentUser = exports.fetchCurrentUser = function fetchCurrentUser(_ref2) {
 	    var dispatch = _ref2.dispatch;
 	    var state = _ref2.state;
+	
+	    console.log('fetchcurrentusers');
+	    (0, _axios2.default)({
+	        method: 'get',
+	        url: state.config.api_url + '/currentuser',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("fetch currentuser returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('fetched current user');
+	            dispatch('CURRENTUSER', response.data.data);
+	            var currentUserRoles = _underscore2.default.pluck(response.data.data.userroles, 'roleId');
+	            if (_underscore2.default.contains(currentUserRoles, 'sixpackadmin')) {
+	                dispatch('ADMIN', true);
+	            }
+	            if (_underscore2.default.contains(currentUserRoles, 'beeradmin')) {
+	                dispatch('BEERADMIN', true);
+	            }
+	        } else {
+	            console.log("get current user failed");
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed currentuser fetch");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	    });
+	};
+	
+	//TODO Make all update functions return a promise so a fetch can be chained
+	var fetchUsers = exports.fetchUsers = function fetchUsers(_ref3) {
+	    var dispatch = _ref3.dispatch;
+	    var state = _ref3.state;
 	
 	    console.log('fetchusers');
 	    (0, _axios2.default)({
@@ -15996,9 +16073,9 @@
 	
 	//No related objects can be updated directly using this function
 	//Return the promise so user can wait on success
-	var editUser = exports.editUser = function editUser(_ref3, user) {
-	    var dispatch = _ref3.dispatch;
-	    var state = _ref3.state;
+	var editUser = exports.editUser = function editUser(_ref4, user) {
+	    var dispatch = _ref4.dispatch;
+	    var state = _ref4.state;
 	
 	    console.log('user edit');
 	    return (0, _axios2.default)({
@@ -16037,9 +16114,9 @@
 	    });
 	};
 	
-	var deleteUser = exports.deleteUser = function deleteUser(_ref4, user) {
-	    var dispatch = _ref4.dispatch;
-	    var state = _ref4.state;
+	var deleteUser = exports.deleteUser = function deleteUser(_ref5, user) {
+	    var dispatch = _ref5.dispatch;
+	    var state = _ref5.state;
 	
 	    console.log('user delete');
 	    return (0, _axios2.default)({
@@ -16077,9 +16154,9 @@
 	    });
 	};
 	
-	var createUser = exports.createUser = function createUser(_ref5, user) {
-	    var dispatch = _ref5.dispatch;
-	    var state = _ref5.state;
+	var createUser = exports.createUser = function createUser(_ref6, user) {
+	    var dispatch = _ref6.dispatch;
+	    var state = _ref6.state;
 	
 	    console.log('user create');
 	    console.log(user);
@@ -16119,9 +16196,9 @@
 	    });
 	};
 	
-	var createUserRole = exports.createUserRole = function createUserRole(_ref6, userId, roleId) {
-	    var dispatch = _ref6.dispatch;
-	    var state = _ref6.state;
+	var createUserRole = exports.createUserRole = function createUserRole(_ref7, userId, roleId) {
+	    var dispatch = _ref7.dispatch;
+	    var state = _ref7.state;
 	
 	    console.log('userrole create');
 	    console.log(userId);
@@ -16162,9 +16239,9 @@
 	    });
 	};
 	
-	var deleteUserRole = exports.deleteUserRole = function deleteUserRole(_ref7, userrole) {
-	    var dispatch = _ref7.dispatch;
-	    var state = _ref7.state;
+	var deleteUserRole = exports.deleteUserRole = function deleteUserRole(_ref8, userrole) {
+	    var dispatch = _ref8.dispatch;
+	    var state = _ref8.state;
 	
 	    console.log('userrole delete');
 	    return (0, _axios2.default)({
@@ -16204,9 +16281,9 @@
 	    });
 	};
 	
-	var fetchConsumptions = exports.fetchConsumptions = function fetchConsumptions(_ref8) {
-	    var dispatch = _ref8.dispatch;
-	    var state = _ref8.state;
+	var fetchConsumptions = exports.fetchConsumptions = function fetchConsumptions(_ref9) {
+	    var dispatch = _ref9.dispatch;
+	    var state = _ref9.state;
 	
 	    console.log('fetchConsumptions');
 	    (0, _axios2.default)({
@@ -16242,9 +16319,9 @@
 	    });
 	};
 	
-	var fetchConsumables = exports.fetchConsumables = function fetchConsumables(_ref9) {
-	    var dispatch = _ref9.dispatch;
-	    var state = _ref9.state;
+	var fetchConsumables = exports.fetchConsumables = function fetchConsumables(_ref10) {
+	    var dispatch = _ref10.dispatch;
+	    var state = _ref10.state;
 	
 	    console.log('fetchConsumables');
 	    (0, _axios2.default)({
@@ -16280,9 +16357,9 @@
 	    });
 	};
 	
-	var createConsumable = exports.createConsumable = function createConsumable(_ref10, name, description) {
-	    var dispatch = _ref10.dispatch;
-	    var state = _ref10.state;
+	var createConsumable = exports.createConsumable = function createConsumable(_ref11, name, description) {
+	    var dispatch = _ref11.dispatch;
+	    var state = _ref11.state;
 	
 	    console.log('consumable create');
 	    return (0, _axios2.default)({
@@ -16312,6 +16389,89 @@
 	            // The request was made, but the server responded with a status code
 	            // that falls out of the range of 2xx
 	            console.log("failed create consumable");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var deleteConsumption = exports.deleteConsumption = function deleteConsumption(_ref12, consumption) {
+	    var dispatch = _ref12.dispatch;
+	    var state = _ref12.state;
+	
+	    console.log('consumption delete');
+	    return (0, _axios2.default)({
+	        method: 'delete',
+	        url: state.config.api_url + '/consumptions/' + consumption.id,
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("consumption delete returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('deleted consumption');
+	            return true;
+	        } else {
+	            console.log("could not delete consumption");
+	            return false;
+	        }
+	        //First element in the items array contains the video data
+	        //dispatch(videoFetchComplete(response.data.items[0]))
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed consumption delete");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var createConsumption = exports.createConsumption = function createConsumption(_ref13, userId, consumableId, amount) {
+	    var dispatch = _ref13.dispatch;
+	    var state = _ref13.state;
+	
+	    console.log('consumption create');
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.api_url + '/consumptions',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify({ userId: userId, consumableId: consumableId, amount: amount }),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("create consumptions returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('created consumptions');
+	            return true;
+	        } else {
+	            console.log("could not create consumptions");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed create consumption");
 	            console.log(response.data);
 	            console.log(response.status);
 	            console.log(response.headers);
@@ -17556,6 +17716,8 @@
 	
 	var _actions = __webpack_require__(18);
 	
+	var _getters = __webpack_require__(37);
+	
 	var _underscore = __webpack_require__(10);
 	
 	var _underscore2 = _interopRequireDefault(_underscore);
@@ -17569,6 +17731,9 @@
 	            fetchUsers: _actions.fetchUsers,
 	            deleteUserRole: _actions.deleteUserRole,
 	            createUserRole: _actions.createUserRole
+	        },
+	        getters: {
+	            users: _getters.getUsers
 	        }
 	    },
 	    data: function data() {
@@ -17581,6 +17746,12 @@
 	            human: false,
 	            selectedRole: 'sixpackadmin'
 	        };
+	    },
+	
+	    computed: {
+	        user: function user() {
+	            return this.users[this.userId];
+	        }
 	    },
 	    ready: function ready() {
 	        this.loadUser();
@@ -17637,7 +17808,7 @@
 	            this.$dispatch('editorClose');
 	        }
 	    },
-	    props: ['user']
+	    props: ['userId']
 	
 	};
 
@@ -17742,48 +17913,19 @@
 /* 44 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\n<div class=\"modal is-active\" v-if=\"editorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-editor v-bind:user=\"users[selectedUser]\"></user-editor>\n        </div>\n    </div>\n    <button v-on:click=\"hideEditor\" class=\"modal-close\"></button>\n</div>\n\n<div class=\"modal is-active\" v-if=\"creatorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-creator></user-creator>\n        </div>\n    </div>\n    <button v-on:click=\"hideCreator\" class=\"modal-close\"></button>\n</div>\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><button v-on:click=\"onCreate\" class=\"button control\">Add user</button></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\" track-by=\"id\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button v-on:click=\"onEdit\" class=\"button is-primary control\" v-bind:index=\"$index\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
+	module.exports = "\n\n<div class=\"modal is-active\" v-if=\"editorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-editor v-bind:user-id=\"selectedUser\"></user-editor>\n        </div>\n    </div>\n    <button v-on:click=\"hideEditor\" class=\"modal-close\"></button>\n</div>\n\n<div class=\"modal is-active\" v-if=\"creatorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-creator></user-creator>\n        </div>\n    </div>\n    <button v-on:click=\"hideCreator\" class=\"modal-close\"></button>\n</div>\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><button v-on:click=\"onCreate\" class=\"button control\">Add user</button></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button v-on:click=\"onEdit\" class=\"button is-primary control\" v-bind:key=\"$key\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"$key\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
 
 /***/ },
 /* 45 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_template__ = __webpack_require__(46)
-	module.exports = __vue_script__ || {}
-	if (module.exports.__esModule) module.exports = module.exports.default
-	if (__vue_template__) {
-	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
-	}
-	if (false) {(function () {  module.hot.accept()
-	  var hotAPI = require("vue-hot-reload-api")
-	  hotAPI.install(require("vue"), false)
-	  if (!hotAPI.compatible) return
-	  var id = "_v-afaf1ed2/AdminDashboard.vue"
-	  if (!module.hot.data) {
-	    hotAPI.createRecord(id, module.exports)
-	  } else {
-	    hotAPI.update(id, module.exports, __vue_template__)
-	  }
-	})()}
-
-/***/ },
-/* 46 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumptions'}\">\n                        Consumptions\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumables'}\">\n                        Consumables\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
-
-/***/ },
-/* 47 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(48)
+	__vue_script__ = __webpack_require__(46)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/admin/ConsumptionManager.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(49)
+	__vue_template__ = __webpack_require__(47)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -17802,7 +17944,7 @@
 	})()}
 
 /***/ },
-/* 48 */
+/* 46 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17822,52 +17964,85 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	exports.default = {
-	    ready: function ready() {
+	    created: function created() {
 	        this.fetchUsers();
 	        this.fetchConsumables();
 	        this.fetchConsumptions();
+	    },
+	    data: function data() {
+	        return {
+	            selectedUser: null,
+	            selectedConsumable: null,
+	            selectedAmount: 0,
+	            error: false
+	        };
 	    },
 	
 	    vuex: {
 	        actions: {
 	            fetchConsumptions: _actions.fetchConsumptions,
 	            fetchConsumables: _actions.fetchConsumables,
-	            fetchUsers: _actions.fetchUsers
+	            fetchUsers: _actions.fetchUsers,
+	            deleteConsumption: _actions.deleteConsumption,
+	            createConsumption: _actions.createConsumption
 	        },
 	        getters: {
-	            consumptions: _getters.getConsumptions
+	            consumptions: _getters.getConsumptions,
+	            users: _getters.getUsers,
+	            consumables: _getters.getConsumables
 	        }
 	    },
 	    methods: {
-	        onCreate: function onCreate(event) {},
+	        onCreate: function onCreate(event) {
+	            var setError = this.setError;
+	            var onRefresh = this.onRefresh;
+	            if (this.selectedUser != null && this.selectedConsumable != null) {
+	                this.createConsumption(this.selectedUser.id, this.selectedConsumable.id, this.selectedAmount.amount).then(function (success) {
+	                    if (success) {
+	                        setError(false);
+	                        onRefresh();
+	                    } else {
+	                        setError(true);
+	                    }
+	                });
+	            }
+	        },
 	        onDelete: function onDelete(event) {
-	            var fetchUsers = this.fetchUsers;
-	            this.deleteUser(this.users[+event.target.getAttribute('index')]).then(function (success) {
+	            var onRefresh = this.onRefresh;
+	            this.deleteConsumption(this.consumptions[+event.target.getAttribute('key')]).then(function (success) {
 	                if (success) {
-	                    fetchUsers();
+	                    onRefresh();
 	                }
 	            });
+	        },
+	        onRefresh: function onRefresh(event) {
+	            this.fetchUsers();
+	            this.fetchConsumables();
+	            this.fetchConsumptions();
+	        },
+	        setError: function setError(value) {
+	            this.error = value;
 	        }
 	    }
 	};
 
 /***/ },
-/* 49 */
+/* 47 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\n<table class=\"table\">\n    <thead>\n    <tr>\n        <th>Username</th>\n        <th>User ID</th>\n        <th>Consumable</th>\n        <th>Amount</th>\n        <th><button v-on:click=\"onCreate\" class=\"button control\">Add consumption</button></th>\n        <th><button v-on:click=\"fetchConsumptions\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr v-for=\"consumption in consumptions\" track-by=\"id\">\n        <td></td>\n        <td>{{ consumption.userId }}</td>\n        <td>{{ consumption.consumableId }}</td>\n        <td></td>\n        <td>\n            <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n        </td>\n    </tr>\n    </tbody>\n</table>\n\n\n\n";
+	module.exports = "\n<p class=\"control is-group\">\n            <span class=\"control-label\">\n                User\n            </span>\n            <span class=\"select\">\n                <select v-model=\"selectedUser\">\n                    <option v-bind:value=\"{ id: user.id}\" v-for=\"user in users\">{{ user.name }}</option>\n                </select>\n            </span>\n            <span class=\"control-label\">\n                Consumable\n            </span>\n            <span class=\"select\">\n                <select v-model=\"selectedConsumable\">\n                    <option v-bind:value=\"{ id: consumable.id}\" v-for=\"consumable in consumables\">{{ consumable.name }}</option>\n                </select>\n            </span>\n            <span class=\"control-label\">\n                Amount\n            </span>\n            <span class=\"select\">\n                <select v-model=\"selectedAmount\">\n                    <option v-bind:value=\"{ amount: n+1}\" v-for=\"n in 5\">{{ n+1 }}</option>\n                    <option v-bind:value=\"{ amount: (n+1) * 10}\" v-for=\"n in 5\">{{ (n+1) * 10 }}</option>\n                    <option v-bind:value=\"{ amount: 100}\">{{ 100 }}</option>\n                </select>\n            </span>\n    <button class=\"button\" @click=\"onCreate\">Add Consumption</button>\n</p>\n<span class=\"tag is-danger\" v-if=\"error\">\n    Error creating consumption\n</span>\n<table class=\"table\">\n    <thead>\n    <tr>\n        <th>Username</th>\n        <th>User ID</th>\n        <th>Consumable</th>\n        <th>Amount</th>\n        <th>Date</th>\n        <th><button v-on:click=\"onRefresh\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr v-for=\"consumption in consumptions | sortDate\">\n        <td>{{ users.hasOwnProperty(consumption.userId) ? users[consumption.userId].name : ''}}</td>\n        <td>{{ consumption.userId }}</td>\n        <td>{{ consumables.hasOwnProperty(consumption.consumableId) ? consumables[consumption.consumableId].name : '' }}</td>\n        <td>{{ consumption.amount }}</td>\n        <td>{{ new Date(consumption.createdAt).toString()}}</td>\n        <td>\n            <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"consumption.id\">Delete</button>\n        </td>\n    </tr>\n    </tbody>\n</table>\n\n\n\n";
 
 /***/ },
-/* 50 */
+/* 48 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(51)
+	__vue_script__ = __webpack_require__(49)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/admin/ConsumablesManager.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(52)
+	__vue_template__ = __webpack_require__(50)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -17886,7 +18061,7 @@
 	})()}
 
 /***/ },
-/* 51 */
+/* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17912,7 +18087,8 @@
 	    data: function data() {
 	        return {
 	            name: '',
-	            description: ''
+	            description: '',
+	            error: false
 	        };
 	    },
 	
@@ -17934,14 +18110,15 @@
 	            var fetchConsumables = this.fetchConsumables;
 	            this.createConsumable(this.name, this.description).then(function (success) {
 	                if (success) {
+	                    setError(false);
 	                    fetchConsumables();
 	                } else {
-	                    setError();
+	                    setError(true);
 	                }
 	            });
 	        },
-	        setError: function setError() {
-	            this.error = true;
+	        setError: function setError(value) {
+	            this.error = value;
 	        },
 	
 	        onDelete: function onDelete(event) {
@@ -17956,10 +18133,39 @@
 	};
 
 /***/ },
+/* 50 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"control is-grouped is-pulled-left is-danger\">\n    <label class=\"control-label\">\n        Name\n    </label>\n    <input class=\"input control\" type=\"text\" v-model=\"name\">\n    <label class=\"control-label\">\n        Description\n    </label>\n    <input class=\"input control\" type=\"text\" v-model=\"description\">\n    <p>\n        <button class=\"button\" @click=\"onCreate\">Create</button>\n    </p>\n</div>\n<span class=\"tag is-danger\" v-if=\"error\">\n    Error creating consumable\n</span>\n<table class=\"table\">\n    <thead>\n    <tr>\n        <th>ID</th>\n        <th>Name</th>\n        <th>Description</th>\n        <th><button v-on:click=\"fetchConsumables\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr v-for=\"consumable in consumables\">\n        <td>{{ consumable.id }}</td>\n        <td>{{ consumable.name }}</td>\n        <td>{{ consumable.description }}</td>\n        <td>\n            <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"$key\">Delete</button>\n        </td>\n    </tr>\n    </tbody>\n</table>\n\n\n\n";
+
+/***/ },
+/* 51 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_template__ = __webpack_require__(52)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-afaf1ed2/AdminDashboard.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
 /* 52 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"control is-grouped\">\n    <label class=\"control-label\">\n        Name\n    </label>\n    <input class=\"input control\" type=\"text\" v-model=\"name\">\n    <label class=\"control-label\">\n        Description\n    </label>\n    <input class=\"input control\" type=\"text\" v-model=\"description\">\n    <p>\n        <button class=\"button\" @click=\"onCreate\">Create</button>\n    </p>\n</div>\n<div class=\"notification is-danger\" v-if=\"error\">\n    Error creating consumable\n</div>\n<table class=\"table\">\n    <thead>\n    <tr>\n        <th>ID</th>\n        <th>Name</th>\n        <th>Description</th>\n        <th><button v-on:click=\"onCreate\" class=\"button control\">Add consumable</button></th>\n        <th><button v-on:click=\"fetchConsumables\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr v-for=\"consumable in consumables\" track-by=\"id\">\n        <td>{{ consumable.id }}</td>\n        <td>{{ consumable.name }}</td>\n        <td>{{ consumable.description }}</td>\n        <td>\n            <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:index=\"$index\">Delete</button>\n        </td>\n    </tr>\n    </tbody>\n</table>\n\n\n\n";
+	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumptions'}\">\n                        Consumptions\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumables'}\">\n                        Consumables\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
 
 /***/ }
 /******/ ]);
