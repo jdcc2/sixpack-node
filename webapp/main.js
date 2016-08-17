@@ -5,9 +5,12 @@ import Vuex from 'vuex'
 import _ from 'underscore'
 import App from './components/App.vue'
 import UserManager from './components/admin/UserManager.vue'
+import UserEditor from './components/admin/UserEditor.vue'
+import UserCreator from './components/admin/UserCreator.vue'
 import ConsumptionManager from './components/admin/ConsumptionManager.vue'
 import ConsumablesManager from './components/admin/ConsumablesManager.vue'
 import AdminDashboard from './components/admin/AdminDashboard.vue'
+import HomeDashboard from './components/HomeDashboard.vue'
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
@@ -24,7 +27,10 @@ Vue.filter('sortDate', function(objectlist) {
 let router = new VueRouter({linkActiveClass: 'is-active'});
 
 router.map({
-   '/admin' : {
+    '/' : {
+        component: HomeDashboard
+    },
+    '/admin' : {
        component: AdminDashboard,
        subRoutes: {
            '/': {
@@ -34,6 +40,12 @@ router.map({
            },
            '/users': {
                component: UserManager
+           },
+           '/users/edit/:userId' : {
+                component: UserEditor
+           },
+           '/users/create': {
+                component: UserCreator
            },
            '/consumptions': {
                component: ConsumptionManager

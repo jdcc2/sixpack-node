@@ -3,6 +3,7 @@
 var Response = require('../response.js')
 var errors = require('../errors.js')
 var models = require('../models.js')
+var ResourceController = require('./ResourceController')
 var _ = require('underscore')
 
 function APITokenController(route, model, options) {
@@ -28,11 +29,20 @@ APITokenController.prototype.getAll = function(req, res, next) {
 }
 
 APITokenController.prototype.delete = function(req, res, next) {
-    var model = model;
+    var model = this.model;
+    console.log('jwtid')
+    console.log(req.params.id)
     this.authorize('delete', req.user, req.params.id).then(function() {
         return model.findById(req.params.id);
     }).then(function(resource){
-        return resource.destroy();
+        console.log('jwtre')
+        console.log(resource)
+        if(resource) {
+            return resource.destroy();
+        } else {
+            throw new errors.ResourceNotFoundError();
+        }
+
     }).then(function(){
         res.json(new Response());
     }).catch(function(err) {
@@ -76,6 +86,8 @@ APITokenController.prototype.create = function(req, res, next) {
         console.log(err);
         next(err);
     });
-}
+};
+
+APITokenController.prototype.authorize = ResourceController.prototype.authorize;
 
 module.exports = APITokenController;

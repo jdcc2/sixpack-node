@@ -22,7 +22,6 @@ function authJWT(req, res, next){
     var data = null;
     if(req.headers.bearer) {
         jwt.verifyAsync(req.headers.bearer).then(function(data){
-            data = data;
             return models.User.findOne({where: {id: data.claims.userId},
                 include: [models.APIToken]});
         }).then(function(user){
@@ -75,49 +74,7 @@ function authCheckAPI(req, res, next) {
     }
 }
 
-//Create the login and signup routes
-authRouter.post('/apilogin', function(req, res, next) {
-    if(req.body.email && req.body.password) {
-        var uid = null;
-        //Find the user based on email
-        models.User.findOne({where: {email: req.body.email}, include: [{ model: models.LocalProfile}]}).then(function(user){
-            if(user && user.localprofile) {
-                //Check the password
-                return new Promise(function(resolve, reject) {
-                    bcrypt.compare(req.body.password, user.localprofile.password, function(err, res) {
-                        if(res) {
-                            console.log('login success');
-                            resolve(user);
-                        } else {
-                            throw new errors.LoginError('Email or password not valid');
-                        }
 
-                    });
-                });
-
-            } else {
-                console.log('wrong user');
-                throw new errors.LoginError('Email or password not valid');
-            }
-        }).then(function(user){
-            uid = user.id;
-            return jwt.signAsync({userId: user.id});
-
-        }).then(function(signed) {
-            console.log('uid')
-            console.log(uid)
-            return models.APIToken.create({jwt: signed, userId: uid, expires: req.params.expires ? new Date(expires) : null});
-        }).then(function(apitoken) {
-            res.json(new Response({jwt: apitoken.jwt}));
-        }).catch(function(err){
-            next(err);
-        });
-    } else {
-        throw new errors.LoginError('Email or password not supplied in JSON format.');
-    }
-
-
-});
 
 passport.use('local', new LocalStrategy({usernameField: 'email'}, function(username, password, done) {
     process.nextTick(function() {
@@ -204,6 +161,52 @@ passport.deserializeUser(function(id, done) {
     }).catch(function(err){
         done(err, null);
     });
+});
+
+//Auth router routes
+authRouter.post('/apilogin', function(req, res, next) {
+    console.log('apilogin')
+    if(req.body.email && req.body.password) {
+        var uid = null;
+        //Find the user based on email
+        models.User.findOne({where: {email: req.body.email}, include: [{ model: models.LocalProfile}]}).then(function(user){
+            if(user && user.localprofile) {
+                //Check the password
+                return new Promise(function(resolve, reject) {
+                    bcrypt.compare(req.body.password, user.localprofile.password, function(err, res) {
+                        if(res) {
+                            console.log('login success');
+                            resolve(user);
+                        } else {
+                            console.log('wrong password')
+                            reject(new errors.LoginError('Email or password not valid'));
+                        }
+
+                    });
+                });
+
+            } else {
+                console.log('wrong user');
+                throw new errors.LoginError('Email or password not valid');
+            }
+        }).then(function(user){
+            uid = user.id;
+            return jwt.signAsync({userId: user.id});
+
+        }).then(function(signed) {
+            console.log('uid')
+            console.log(uid)
+            return models.APIToken.create({jwt: signed, userId: uid, expires: req.params.expires ? new Date(expires) : null});
+        }).then(function(apitoken) {
+            res.json(new Response({jwt: apitoken.jwt}));
+        }).catch(function(err){
+            next(err);
+        });
+    } else {
+        next(new errors.LoginError('Email or password not supplied in JSON format.'));
+    }
+
+
 });
 
 authRouter.get('/google', passport.authenticate('google', { scope : ['profile', 'email'] }));

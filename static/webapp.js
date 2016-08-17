@@ -81,6 +81,14 @@
 	
 	var _UserManager2 = _interopRequireDefault(_UserManager);
 	
+	var _UserEditor = __webpack_require__(38);
+	
+	var _UserEditor2 = _interopRequireDefault(_UserEditor);
+	
+	var _UserCreator = __webpack_require__(41);
+	
+	var _UserCreator2 = _interopRequireDefault(_UserCreator);
+	
 	var _ConsumptionManager = __webpack_require__(45);
 	
 	var _ConsumptionManager2 = _interopRequireDefault(_ConsumptionManager);
@@ -92,6 +100,10 @@
 	var _AdminDashboard = __webpack_require__(51);
 	
 	var _AdminDashboard2 = _interopRequireDefault(_AdminDashboard);
+	
+	var _HomeDashboard = __webpack_require__(54);
+	
+	var _HomeDashboard2 = _interopRequireDefault(_HomeDashboard);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -110,6 +122,9 @@
 	var router = new _vueRouter2.default({ linkActiveClass: 'is-active' });
 	
 	router.map({
+	    '/': {
+	        component: _HomeDashboard2.default
+	    },
 	    '/admin': {
 	        component: _AdminDashboard2.default,
 	        subRoutes: {
@@ -120,6 +135,12 @@
 	            },
 	            '/users': {
 	                component: _UserManager2.default
+	            },
+	            '/users/edit/:userId': {
+	                component: _UserEditor2.default
+	            },
+	            '/users/create': {
+	                component: _UserCreator2.default
 	            },
 	            '/consumptions': {
 	                component: _ConsumptionManager2.default
@@ -15735,7 +15756,8 @@
 	    admin: false,
 	    beeradmin: false,
 	    config: {
-	        api_url: 'http://localhost:3000/api'
+	        api_url: 'http://localhost:3000/api',
+	        url: 'http://localhost:3000'
 	        //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
 	    },
 	    users: {},
@@ -15843,7 +15865,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createConsumption = exports.deleteConsumption = exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.fetchCurrentUser = exports.showMessage = undefined;
+	exports.createAPIToken = exports.deleteAPIToken = exports.createConsumption = exports.deleteConsumption = exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.fetchCurrentUser = exports.showMessage = undefined;
 	
 	var _axios = __webpack_require__(16);
 	
@@ -16135,8 +16157,6 @@
 	            console.log("could not delete userrole");
 	            return false;
 	        }
-	        //First element in the items array contains the video data
-	        //dispatch(videoFetchComplete(response.data.items[0]))
 	    }).catch(function (response) {
 	        if (response instanceof Error) {
 	            // Something happened in setting up the request that triggered an Error
@@ -16294,8 +16314,6 @@
 	            console.log("could not delete consumption");
 	            return false;
 	        }
-	        //First element in the items array contains the video data
-	        //dispatch(videoFetchComplete(response.data.items[0]))
 	    }).catch(function (response) {
 	        if (response instanceof Error) {
 	            // Something happened in setting up the request that triggered an Error
@@ -16345,6 +16363,87 @@
 	            // The request was made, but the server responded with a status code
 	            // that falls out of the range of 2xx
 	            console.log("failed create consumption");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var deleteAPIToken = exports.deleteAPIToken = function deleteAPIToken(_ref14, jwt) {
+	    var dispatch = _ref14.dispatch;
+	    var state = _ref14.state;
+	
+	    console.log('consumption delete');
+	    return (0, _axios2.default)({
+	        method: 'delete',
+	        url: state.config.api_url + '/apitokens/' + jwt,
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("apitoken delete returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('deleted apitoken');
+	            return true;
+	        } else {
+	            console.log("could not delete apitoken");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed apitoken delete");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var createAPIToken = exports.createAPIToken = function createAPIToken(_ref15, email, password) {
+	    var dispatch = _ref15.dispatch;
+	    var state = _ref15.state;
+	
+	    console.log('consumption create');
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.url + '/auth/apilogin',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify({ email: email, password: password }),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("create apitoken returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('created apitoken');
+	            return true;
+	        } else {
+	            console.log("could not create apitoken");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed create apitoken");
 	            console.log(response.data);
 	            console.log(response.status);
 	            console.log(response.headers);
@@ -17553,7 +17652,7 @@
 /* 35 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"container\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div class=\"section\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
+	module.exports = "\n<div style=\"margin-left: 20px; margin-right: 20px;\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div style=\"margin-top: 20px\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
 
 /***/ },
 /* 36 */
@@ -17597,14 +17696,6 @@
 	
 	var _getters = __webpack_require__(34);
 	
-	var _UserEditor = __webpack_require__(38);
-	
-	var _UserEditor2 = _interopRequireDefault(_UserEditor);
-	
-	var _UserCreator = __webpack_require__(41);
-	
-	var _UserCreator2 = _interopRequireDefault(_UserCreator);
-	
 	var _underscore = __webpack_require__(10);
 	
 	var _underscore2 = _interopRequireDefault(_underscore);
@@ -17613,10 +17704,7 @@
 	
 	exports.default = {
 	    data: function data() {
-	        console.log(_underscore2.default.pluck([{ "name": "peter" }], 'name'));
 	        return {
-	            selectedUser: 0,
-	            editorVisible: false,
 	            creatorVisible: false
 	        };
 	    },
@@ -17633,24 +17721,7 @@
 	            users: _getters.getUsers
 	        }
 	    },
-	    components: {
-	        UserEditor: _UserEditor2.default,
-	        UserCreator: _UserCreator2.default
-	    },
 	    methods: {
-	        onEdit: function onEdit(event) {
-	            this.selectedUser = +event.target.getAttribute('key');
-	            this.editorVisible = true;
-	        },
-	        onCreate: function onCreate(event) {
-	            this.creatorVisible = true;
-	        },
-	        hideEditor: function hideEditor() {
-	            this.editorVisible = false;
-	        },
-	        hideCreator: function hideCreator() {
-	            this.creatorVisible = false;
-	        },
 	        onDelete: function onDelete(event) {
 	            var fetchUsers = this.fetchUsers;
 	            this.deleteUser(this.users[+event.target.getAttribute('key')]).then(function (success) {
@@ -17658,16 +17729,12 @@
 	                    fetchUsers();
 	                }
 	            });
-	        }
-	    },
-	    events: {
-	        'editorClose': function editorClose() {
-	            this.hideEditor();
-	            this.fetchUsers();
 	        },
-	        'creatorClose': function creatorClose() {
-	            this.hideCreator();
-	            this.fetchUsers();
+	        onEdit: function onEdit(event) {
+	            this.$route.router.go({ path: '/admin/users/edit/' + +event.target.getAttribute('key') });
+	        },
+	        onCreate: function onCreate(event) {
+	            this.$route.router.go('/admin/users/create');
 	        }
 	    }
 	};
@@ -17746,7 +17813,7 @@
 	
 	    computed: {
 	        user: function user() {
-	            return this.users[this.userId];
+	            return this.users[this.$route.params.userId];
 	        }
 	    },
 	    ready: function ready() {
@@ -17757,9 +17824,10 @@
 	        doEdit: function doEdit() {
 	            var notifyClose = this.notifyClose;
 	            var setError = this.setError;
+	            var onReturn = this.onReturn;
 	            this.editUser({ id: this.id, name: this.name, email: this.email, human: this.human }).then(function (success) {
 	                if (success) {
-	                    notifyClose();
+	                    onReturn();
 	                } else {
 	                    setError('Error editing user.');
 	                }
@@ -17800,11 +17868,10 @@
 	            this.error = true;
 	            this.errorMessage = errorMessage;
 	        },
-	        notifyClose: function notifyClose() {
-	            this.$dispatch('editorClose');
+	        onReturn: function onReturn() {
+	            this.$route.router.go('/admin/users');
 	        }
-	    },
-	    props: ['userId']
+	    }
 	
 	};
 
@@ -17812,7 +17879,7 @@
 /* 40 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n         <p class=\"card-header-title\">\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n\n         <p class=\"card-header-title\">\n             <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
 
 /***/ },
 /* 41 */
@@ -17876,14 +17943,14 @@
 	
 	    methods: {
 	        onCreate: function onCreate() {
-	            var notifyClose = this.notifyClose;
 	            var setError = this.setError;
+	            var onReturn = this.onReturn;
 	            this.createUser({
 	                name: this.name, email: this.email, password: this.password, human: this.human,
 	                admin: this.admin, beerAdmin: this.beerAdmin
 	            }).then(function (success) {
 	                if (success) {
-	                    notifyClose();
+	                    onReturn();
 	                } else {
 	                    setError();
 	                }
@@ -17892,8 +17959,8 @@
 	        setError: function setError() {
 	            this.error = true;
 	        },
-	        notifyClose: function notifyClose() {
-	            this.$dispatch('creatorClose');
+	        onReturn: function onReturn() {
+	            this.$route.router.go('/admin/users');
 	        }
 	    }
 	
@@ -17903,13 +17970,13 @@
 /* 43 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            Create user\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"admin\">Admin?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"beerAdmin\">Beer Admin?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"onCreate\">Save</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error creating user\n        </div>\n    </div>\n\n</div>\n";
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n            Create user\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"admin\">Admin?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"beerAdmin\">Beer Admin?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"onCreate\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error creating user\n        </div>\n    </div>\n\n</div>\n";
 
 /***/ },
 /* 44 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\n<div class=\"modal is-active\" v-if=\"editorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-editor v-bind:user-id=\"selectedUser\"></user-editor>\n        </div>\n    </div>\n    <button v-on:click=\"hideEditor\" class=\"modal-close\"></button>\n</div>\n\n<div class=\"modal is-active\" v-if=\"creatorVisible\">\n    <div class=\"modal-background\"></div>\n    <div class=\"modal-container\">\n        <div class=\"modal-content\">\n            <user-creator></user-creator>\n        </div>\n    </div>\n    <button v-on:click=\"hideCreator\" class=\"modal-close\"></button>\n</div>\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><button v-on:click=\"onCreate\" class=\"button control\">Add user</button></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button v-on:click=\"onEdit\" class=\"button is-primary control\" v-bind:key=\"$key\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"$key\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
+	module.exports = "\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><a v-link=\"{ path: '/admin/users/create'}\"><button class=\"button is-primary control\">Add user</button></a></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button class=\"button is-primary control\" v-bind:key=\"$key\" @click=\"onEdit\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"$key\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
 
 /***/ },
 /* 45 */
@@ -18139,12 +18206,12 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(53)
+	__vue_script__ = __webpack_require__(52)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/admin/AdminDashboard.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(52)
+	__vue_template__ = __webpack_require__(53)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -18164,12 +18231,6 @@
 
 /***/ },
 /* 52 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumptions'}\">\n                        Consumptions\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumables'}\">\n                        Consumables\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
-
-/***/ },
-/* 53 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -18198,6 +18259,159 @@
 	        }
 	    }
 	};
+
+/***/ },
+/* 53 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div class=\"columns\">\n    <div class=\"column is-one-quarter\">\n        <aside class=\"menu\">\n            <p class=\"menu-label\">\n                Admin Dashboard\n            </p>\n            <ul class=\"menu-list\">\n                <li>\n                    <a v-link=\"{path: '/admin/users'}\">\n                        Users\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumptions'}\">\n                        Consumptions\n                    </a>\n                </li>\n                <li>\n                    <a v-link=\"{path: '/admin/consumables'}\">\n                        Consumables\n                    </a>\n                </li>\n            </ul>\n        </aside>\n    </div>\n    <div class=\"column is-three-quarters\">\n        <router-view></router-view>\n    </div>\n</div>\n";
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(55)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/HomeDashboard.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(59)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-53728413/HomeDashboard.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _UserInfo = __webpack_require__(56);
+	
+	var _UserInfo2 = _interopRequireDefault(_UserInfo);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	exports.default = {
+	    components: {
+	        UserInfo: _UserInfo2.default
+	    }
+	
+	};
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __vue_script__, __vue_template__
+	__vue_script__ = __webpack_require__(57)
+	if (__vue_script__ &&
+	    __vue_script__.__esModule &&
+	    Object.keys(__vue_script__).length > 1) {
+	  console.warn("[vue-loader] webapp/components/UserInfo.vue: named exports in *.vue files are ignored.")}
+	__vue_template__ = __webpack_require__(58)
+	module.exports = __vue_script__ || {}
+	if (module.exports.__esModule) module.exports = module.exports.default
+	if (__vue_template__) {
+	(typeof module.exports === "function" ? (module.exports.options || (module.exports.options = {})) : module.exports).template = __vue_template__
+	}
+	if (false) {(function () {  module.hot.accept()
+	  var hotAPI = require("vue-hot-reload-api")
+	  hotAPI.install(require("vue"), false)
+	  if (!hotAPI.compatible) return
+	  var id = "_v-3a8cd5eb/UserInfo.vue"
+	  if (!module.hot.data) {
+	    hotAPI.createRecord(id, module.exports)
+	  } else {
+	    hotAPI.update(id, module.exports, __vue_template__)
+	  }
+	})()}
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	
+	var _getters = __webpack_require__(34);
+	
+	var _actions = __webpack_require__(15);
+	
+	exports.default = {
+	    vuex: {
+	        getters: {
+	            user: _getters.getCurrentUser
+	        },
+	        actions: {
+	            fetchCurrentUser: _actions.fetchCurrentUser,
+	            deleteAPIToken: _actions.deleteAPIToken,
+	            createAPIToken: _actions.createAPIToken
+	        }
+	    },
+	    data: function data() {
+	        return {
+	            selectedToken: null,
+	            password: ''
+	        };
+	    },
+	
+	    methods: {
+	        onDeleteToken: function onDeleteToken(event, jwt) {
+	            var fetchCurrentUser = this.fetchCurrentUser;
+	            this.deleteAPIToken(event.target.getAttribute('jwt')).then(function (success) {
+	                if (success) {
+	                    fetchCurrentUser();
+	                } else {}
+	            });
+	        },
+	        onTokenSelect: function onTokenSelect(event) {
+	            this.selectedToken = event.target.getAttribute('jwt');
+	        },
+	        onCreateToken: function onCreateToken() {
+	            var fetchCurrentUser = this.fetchCurrentUser;
+	            this.createAPIToken(this.user.email, this.password).then(function (success) {
+	                if (success) {
+	                    fetchCurrentUser();
+	                } else {}
+	            });
+	            this.password = '';
+	        }
+	    }
+	};
+
+/***/ },
+/* 58 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<div v-if=\"user != null\">\n    <div class=\"card is-fullwidth\">\n        <div class=\"card-header\">\n            <p class=\"card-header-title\">\n                Info\n            </p>\n        </div>\n        <div class=\"card-content\">\n            <label class=\"label\">\n                Name\n            </label>\n            <p>\n                {{ user ? user.name : '' }}\n            </p>\n            <label class=\"label\">\n                E-mail\n            </label>\n            <p>\n                {{ user ? user.email : '' }}\n            </p>\n            <label class=\"label\">\n                Current roles\n            </label>\n\n            <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n                <span>{{ role.roleId }}</span>\n            </span>\n            <label class=\"label\">\n                API Keys\n            </label>\n            <p class=\"control is-grouped\">\n                <label style=\"margin-right: 10px;\">\n                    Password\n                </label>\n                <input class=\"input control\" style=\"max-width: 50%\" type=\"password\" v-model=\"password\">\n                <button class=\"button control\" @click=\"onCreateToken\">Create API token</button>\n            </p>\n            <p class=\"control\" v-for=\"token in user.apitokens\">\n                <button class=\"button\" @click=\"onTokenSelect\" v-bind:jwt=\"token.jwt\">{{ token.jwt.slice(0,10) }}</button>\n                <button class=\"button fa fa-trash-o\" v-on:click=\"onDeleteToken\" v-bind:jwt=\"token.jwt\"></button>\n            </p>\n\n            <textarea class=\"textarea\" v-if=\"selectedToken != null\">\n                {{ selectedToken}}\n            </textarea>\n\n        </div>\n    </div>\n\n</div>\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            Consumptions\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <table class=\"table\">\n            <thead>\n            <tr>\n                <th>Consumable</th>\n                <th>Amount</th>\n                <th>Date</th>\n            </tr>\n            </thead>\n            <tbody v-if=\"user != null\">\n\n            <tr v-for=\"consumption in user.consumptions | sortDate\">\n                <td>{{ consumption.consumable.id}}</td>\n                <td>{{ consumption.amount }}</td>\n                <td>{{ new Date(consumption.createdAt).toString()}}</td>\n\n            </tr>\n            </tbody>\n        </table>\n    </div>\n\n</div>\n\n";
+
+/***/ },
+/* 59 */
+/***/ function(module, exports) {
+
+	module.exports = "\n<user-info></user-info>\n";
 
 /***/ }
 /******/ ]);

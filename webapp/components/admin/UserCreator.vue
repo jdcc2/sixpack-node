@@ -2,6 +2,7 @@
     <div class="card is-fullwidth">
         <div class="card-header">
             <p class="card-header-title">
+                <a v-link="{path: '/admin/users'}"><i class="fa fa-arrow-left"></i></a><span style="width: 20px;"></span>
                 Create user
             </p>
         </div>
@@ -23,6 +24,7 @@
             <input type="checkbox" class="checkbox control"  v-model="beerAdmin">Beer Admin?
             <p class="control">
                 <button class="button" @click="onCreate">Save</button>
+                <button class="button" @click="onReturn">Cancel</button>
             </p>
             <div class="notification is-danger" v-if="error">
                 Error creating user
@@ -56,14 +58,14 @@
         },
         methods: {
             onCreate() {
-                let notifyClose = this.notifyClose;
                 let setError = this.setError;
+                let onReturn = this.onReturn;
                 this.createUser({
                                     name: this.name, email: this.email, password: this.password, human: this.human,
                                     admin: this.admin, beerAdmin: this.beerAdmin
                 }).then(function(success){
                     if(success) {
-                        notifyClose();
+                        onReturn();
                     } else {
                         setError();
                     }
@@ -73,8 +75,8 @@
             setError() {
                 this.error = true;
             },
-            notifyClose() {
-                this.$dispatch('creatorClose');
+            onReturn() {
+                this.$route.router.go('/admin/users')
             }
         }
 

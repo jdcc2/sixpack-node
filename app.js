@@ -96,8 +96,8 @@ app.use(morgan('dev'));
 app.use('/static', express.static('static'))
 
 //Routers
-app.use('/api', apiRouter)
-app.use('/auth', auth.authRouter)
+app.use('/api', apiRouter);
+app.use('/auth', auth.authRouter);
 app.use('/', router); //This one should be specified last because it contains a catch-all route
 
 
@@ -117,6 +117,8 @@ app.use(function(err, req, res, next) {
     } else {
         //Loop over each type of custom error and check if that's the one
         _.each(errors, function(errorClass) {
+            console.log(errorClass);
+            console.log(err);
             if(err instanceof errorClass) {
                 res.status(err.status);
                 res.json({ok: false, error: err.error, errorMessage: err.message, reason: err.reason});

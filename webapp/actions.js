@@ -272,8 +272,6 @@ export const deleteUserRole = function({dispatch, state}, userrole) {
             console.log("could not delete userrole");
             return false;
         }
-        //First element in the items array contains the video data
-        //dispatch(videoFetchComplete(response.data.items[0]))
 
     }).catch(function(response) {
         if (response instanceof Error) {
@@ -427,8 +425,6 @@ export const deleteConsumption = function({dispatch, state}, consumption) {
             console.log("could not delete consumption");
             return false;
         }
-        //First element in the items array contains the video data
-        //dispatch(videoFetchComplete(response.data.items[0]))
 
     }).catch(function(response) {
         if (response instanceof Error) {
@@ -479,6 +475,85 @@ export const createConsumption = function({dispatch, state}, userId, consumableI
             // The request was made, but the server responded with a status code
             // that falls out of the range of 2xx
             console.log("failed create consumption");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+        return false;
+    });
+};
+
+export const deleteAPIToken = function({dispatch, state}, jwt) {
+    console.log('consumption delete')
+    return axios({
+        method: 'delete',
+        url: `${state.config.api_url}/apitokens/${jwt}`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("apitoken delete returned");
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('deleted apitoken');
+            return true;
+        } else {
+            console.log("could not delete apitoken");
+            return false;
+        }
+
+    }).catch(function(response) {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed apitoken delete");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+        return false;
+    });
+};
+
+export const createAPIToken = function({dispatch, state}, email, password) {
+    console.log('consumption create');
+    return axios({
+        method: 'post',
+        url: `${state.config.url}/auth/apilogin`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        data : JSON.stringify({email, password}),
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("create apitoken returned")
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('created apitoken')
+            return true;
+        } else {
+            console.log("could not create apitoken");
+            return false;
+        }
+
+    }).catch(function(response) {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed create apitoken");
             console.log(response.data);
             console.log(response.status);
             console.log(response.headers);

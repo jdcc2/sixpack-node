@@ -61,7 +61,7 @@ UserController.prototype.getAll = function(req, res, next) {
         _.each(resources, function(value) {
             resourcesObject[value.id] = value;
         });
-        res.json(new Response(resources));
+        res.json(new Response(resourcesObject));
     }).catch(function(err) {
         next(err);
     });
@@ -155,7 +155,11 @@ UserController.prototype.delete = function(req, res, next) {
     this.authorize('delete', req.user, req.params.id).then(function() {
         return model.findById(req.params.id);
     }).then(function(resource){
-        return resource.destroy();
+        if(resource) {
+            return resource.destroy();
+        } else {
+            throw new errors.ResourceNotFoundError();
+        }
     }).then(function(){
         res.json(new Response());
     }).catch(function(err) {

@@ -11,7 +11,8 @@ const state = {
     admin: false,
     beeradmin: false,
     config: {
-        api_url : 'http://localhost:3000/api'
+        api_url : 'http://localhost:3000/api',
+        url: 'http://localhost:3000'
         //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
     },
     users: {},

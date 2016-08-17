@@ -1,7 +1,9 @@
 <template>
     <div class="card is-fullwidth">
         <div class="card-header">
+
              <p class="card-header-title">
+                 <a v-link="{path: '/admin/users'}"><i class="fa fa-arrow-left"></i></a><span style="width: 20px;"></span>
                  Edit user {{ id }}
              </p>
         </div>
@@ -37,6 +39,7 @@
 
             <p class="control">
                 <button class="button" @click="doEdit">Save</button>
+                <button class="button" @click="onReturn">Cancel</button>
             </p>
             <div class="notification is-danger" v-if="error">
                 {{ errorMessage }}
@@ -77,7 +80,7 @@
         },
         computed: {
             user: function() {
-                return this.users[this.userId];
+                return this.users[this.$route.params.userId];
             }
         },
         //Copy user properties initially so an update of the user list does not destroy the edits
@@ -88,9 +91,10 @@
             doEdit() {
                 let notifyClose = this.notifyClose;
                 let setError = this.setError;
+                let onReturn = this.onReturn;
                 this.editUser({id: this.id, name: this.name, email: this.email, human: this.human}).then(function(success){
                     if(success) {
-                        notifyClose();
+                        onReturn();
                     } else {
                         setError('Error editing user.');
                     }
@@ -133,11 +137,10 @@
                 this.error = true;
                 this.errorMessage = errorMessage;
             },
-            notifyClose() {
-                this.$dispatch('editorClose');
+            onReturn() {
+                this.$route.router.go('/admin/users')
             }
-        },
-        props : ['userId']
+        }
 
 
     }

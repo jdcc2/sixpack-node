@@ -1,25 +1,5 @@
 <template>
 
-    <div class="modal is-active" v-if="editorVisible">
-        <div class="modal-background"></div>
-        <div class="modal-container">
-            <div class="modal-content">
-                <user-editor v-bind:user-id="selectedUser"></user-editor>
-            </div>
-        </div>
-        <button v-on:click="hideEditor" class="modal-close"></button>
-    </div>
-
-    <div class="modal is-active" v-if="creatorVisible">
-        <div class="modal-background"></div>
-        <div class="modal-container">
-            <div class="modal-content">
-                <user-creator></user-creator>
-            </div>
-        </div>
-        <button v-on:click="hideCreator" class="modal-close"></button>
-    </div>
-
     <table class="table">
         <thead>
             <tr>
@@ -27,7 +7,7 @@
                 <th>E-mail</th>
                 <th>Human?</th>
                 <th>Roles</th>
-                <th><button v-on:click="onCreate" class="button control">Add user</button></th>
+                <th><a v-link="{ path: '/admin/users/create'}"><button class="button is-primary control">Add user</button></a></th>
                 <th><button v-on:click="fetchUsers" class="button control"><i class="fa fa-refresh" aria-hidden="true"></i></button></th>
             </tr>
         </thead>
@@ -38,7 +18,7 @@
                 <td>{{ user.human }}</td>
                 <td>{{ user.userroles | roles }}</td>
                 <td>
-                    <button v-on:click="onEdit" class="button is-primary control" v-bind:key="$key">Edit</button>
+                    <button class="button is-primary control" v-bind:key="$key" @click="onEdit">Edit</button>
                     <button v-on:click="onDelete" class="button is-primary control" v-bind:key="$key">Delete</button>
                 </td>
             </tr>
@@ -52,16 +32,11 @@
 <script>
     import {fetchUsers, deleteUser} from '../../actions.js'
     import {getUsers} from '../../getters.js'
-    import UserEditor from './UserEditor.vue'
-    import UserCreator from './UserCreator.vue'
     import _ from 'underscore'
 
     export default {
         data() {
-            console.log(_.pluck([{"name": "peter"}], 'name'));
             return {
-                selectedUser: 0,
-                editorVisible: false,
                 creatorVisible: false
             }
         },
@@ -77,26 +52,7 @@
                 users: getUsers
             }
         },
-        components: {
-            UserEditor,
-            UserCreator
-        },
         methods: {
-            onEdit: function(event) {
-                this.selectedUser = +event.target.getAttribute('key');
-                this.editorVisible = true;
-
-            },
-            onCreate: function(event) {
-                this.creatorVisible = true;
-
-            },
-            hideEditor: function() {
-                this.editorVisible = false;
-            },
-            hideCreator: function() {
-                this.creatorVisible = false;
-            },
             onDelete: function(event) {
                 let fetchUsers = this.fetchUsers;
                 this.deleteUser(this.users[+event.target.getAttribute('key')]).then(function(success){
@@ -105,18 +61,13 @@
                     }
 
                 })
-            }
-        },
-        events: {
-            'editorClose' : function() {
-                this.hideEditor();
-                this.fetchUsers();
-
-
             },
-            'creatorClose': function() {
-                this.hideCreator();
-                this.fetchUsers();
+            onEdit: function(event){
+                //The same function could be achieved by using a v-link attribute on the edit button/a tag
+                this.$route.router.go({path: `/admin/users/edit/${+event.target.getAttribute('key')}` })
+            },
+            onCreate: function(event) {
+                this.$route.router.go('/admin/users/create');
             }
         }
     }

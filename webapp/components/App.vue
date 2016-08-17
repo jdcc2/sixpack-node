@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div style="margin-left: 20px; margin-right: 20px;">
         <section class="hero">
             <div class="container is-fluid">
                 <div class="hero-body">
@@ -27,7 +27,7 @@
                 <span></span>
             </div>
         </div>
-        <div class="section">
+        <div style="margin-top: 20px">
             <router-view></router-view>
         </div>
 

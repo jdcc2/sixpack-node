@@ -146,7 +146,11 @@ ResourceController.prototype.delete = function(req, res, next) {
     this.authorize('delete', req.user, req.params.id).then(function() {
         return model.findById(req.params.id);
     }).then(function(resource){
-        return resource.destroy();
+        if(resource) {
+            return resource.destroy();
+        } else {
+            throw new errors.ResourceNotFoundError();
+        }
     }).then(function(){
         res.json(new Response());
     }).catch(function(err) {
