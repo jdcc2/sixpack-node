@@ -28,13 +28,16 @@
                 <button type="submit" class="button is-active">Login</button>
             </form>
 
-            <p>Login with:</p>
+            <% if (gauth) { %>
+                <p>Login with:</p>
 
-            <a href="/auth/google/login" class="button is-danger"><i class="fa fa-google-plus"></i> Google Login</a>
+                <a href="/auth/google/login" class="button is-danger"><i class="fa fa-google-plus"></i> Google Login</a>
 
-            <p>Signup with:</p>
+                <p>Signup with:</p>
 
-            <a href="/auth/google/signup" class="button is-danger"><i class="fa fa-google-plus"></i> Google Sign-up</a>
+                <a href="/auth/google/signup" class="button is-danger"><i class="fa fa-google-plus"></i> Google Sign-up</a>
+            <% } %>
+
 
             <% if (error) { %>
             <div class="notification is-warning">

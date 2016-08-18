@@ -49,7 +49,7 @@
         </div>
 
     </div>
-    <div class="card is-fullwidth">
+    <div class="card is-fullwidth" style="margin-top: 20px;">
         <div class="card-header">
             <p class="card-header-title">
                 Consumptions
