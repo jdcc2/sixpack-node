@@ -5,7 +5,8 @@
             <tr>
                 <th>Name</th>
                 <th>E-mail</th>
-                <th>Human?</th>
+                <th>Human</th>
+                <th>Active</th>
                 <th>Roles</th>
                 <th><a v-link="{ path: '/admin/users/create'}"><button class="button is-primary control">Add user</button></a></th>
                 <th><button v-on:click="fetchUsers" class="button control"><i class="fa fa-refresh" aria-hidden="true"></i></button></th>
@@ -16,6 +17,7 @@
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.human }}</td>
+                <td>{{ user.active }}</td>
                 <td>{{ user.userroles | roles }}</td>
                 <td>
                     <button class="button is-primary control" v-bind:key="$key" @click="onEdit">Edit</button>

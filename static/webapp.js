@@ -81,11 +81,11 @@
 	
 	var _UserManager2 = _interopRequireDefault(_UserManager);
 	
-	var _UserEditor = __webpack_require__(38);
+	var _UserEditor = __webpack_require__(39);
 	
 	var _UserEditor2 = _interopRequireDefault(_UserEditor);
 	
-	var _UserCreator = __webpack_require__(41);
+	var _UserCreator = __webpack_require__(42);
 	
 	var _UserCreator2 = _interopRequireDefault(_UserCreator);
 	
@@ -17664,7 +17664,7 @@
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/admin/UserManager.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(44)
+	__vue_template__ = __webpack_require__(38)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -17741,15 +17741,21 @@
 
 /***/ },
 /* 38 */
+/***/ function(module, exports) {
+
+	module.exports = "\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human</th>\n            <th>Active</th>\n            <th>Roles</th>\n            <th><a v-link=\"{ path: '/admin/users/create'}\"><button class=\"button is-primary control\">Add user</button></a></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.active }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button class=\"button is-primary control\" v-bind:key=\"$key\" @click=\"onEdit\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"$key\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
+
+/***/ },
+/* 39 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(39)
+	__vue_script__ = __webpack_require__(40)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/admin/UserEditor.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(40)
+	__vue_template__ = __webpack_require__(41)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -17768,7 +17774,7 @@
 	})()}
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17807,6 +17813,7 @@
 	            name: '',
 	            email: '',
 	            human: false,
+	            active: false,
 	            selectedRole: 'sixpackadmin'
 	        };
 	    },
@@ -17825,7 +17832,7 @@
 	            var notifyClose = this.notifyClose;
 	            var setError = this.setError;
 	            var onReturn = this.onReturn;
-	            this.editUser({ id: this.id, name: this.name, email: this.email, human: this.human }).then(function (success) {
+	            this.editUser({ id: this.id, name: this.name, email: this.email, human: this.human, active: this.active }).then(function (success) {
 	                if (success) {
 	                    onReturn();
 	                } else {
@@ -17838,6 +17845,7 @@
 	            this.name = this.user.name;
 	            this.email = this.user.email;
 	            this.human = this.user.human;
+	            this.active = this.user.active;
 	        },
 	        doDeleteUserRole: function doDeleteUserRole(event) {
 	            var setError = this.setError;
@@ -17876,22 +17884,22 @@
 	};
 
 /***/ },
-/* 40 */
+/* 41 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n\n         <p class=\"card-header-title\">\n             <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n\n         <p class=\"card-header-title\">\n             <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"active\">Active?\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
 
 /***/ },
-/* 41 */
+/* 42 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __vue_script__, __vue_template__
-	__vue_script__ = __webpack_require__(42)
+	__vue_script__ = __webpack_require__(43)
 	if (__vue_script__ &&
 	    __vue_script__.__esModule &&
 	    Object.keys(__vue_script__).length > 1) {
 	  console.warn("[vue-loader] webapp/components/admin/UserCreator.vue: named exports in *.vue files are ignored.")}
-	__vue_template__ = __webpack_require__(43)
+	__vue_template__ = __webpack_require__(44)
 	module.exports = __vue_script__ || {}
 	if (module.exports.__esModule) module.exports = module.exports.default
 	if (__vue_template__) {
@@ -17910,7 +17918,7 @@
 	})()}
 
 /***/ },
-/* 42 */
+/* 43 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -17967,16 +17975,10 @@
 	};
 
 /***/ },
-/* 43 */
-/***/ function(module, exports) {
-
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n            Create user\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"admin\">Admin?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"beerAdmin\">Beer Admin?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"onCreate\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error creating user\n        </div>\n    </div>\n\n</div>\n";
-
-/***/ },
 /* 44 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\n<table class=\"table\">\n    <thead>\n        <tr>\n            <th>Name</th>\n            <th>E-mail</th>\n            <th>Human?</th>\n            <th>Roles</th>\n            <th><a v-link=\"{ path: '/admin/users/create'}\"><button class=\"button is-primary control\">Add user</button></a></th>\n            <th><button v-on:click=\"fetchUsers\" class=\"button control\"><i class=\"fa fa-refresh\" aria-hidden=\"true\"></i></button></th>\n        </tr>\n    </thead>\n    <tbody>\n        <tr v-for=\"user in users\">\n            <td>{{ user.name }}</td>\n            <td>{{ user.email }}</td>\n            <td>{{ user.human }}</td>\n            <td>{{ user.userroles | roles }}</td>\n            <td>\n                <button class=\"button is-primary control\" v-bind:key=\"$key\" @click=\"onEdit\">Edit</button>\n                <button v-on:click=\"onDelete\" class=\"button is-primary control\" v-bind:key=\"$key\">Delete</button>\n            </td>\n        </tr>\n    </tbody>\n</table>\n\n\n\n";
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n        <p class=\"card-header-title\">\n            <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n            Create user\n        </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"admin\">Admin?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"beerAdmin\">Beer Admin?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"onCreate\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            Error creating user\n        </div>\n    </div>\n\n</div>\n";
 
 /***/ },
 /* 45 */

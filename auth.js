@@ -99,8 +99,14 @@ passport.use('local', new LocalStrategy({usernameField: 'email'}, function(usern
                 throw new errors.LoginError('Email or password not valid');
             }
         }).then(function(user){
-            console.log('passport login success');
-            return done(null, user);
+            if(user.active) {
+                console.log('passport login success');
+                return done(null, user);
+            } else {
+                console.log('local login failed. User not active.')
+                return done(null, false);
+            }
+
 
         }).catch(function(err){
             console.log('passport login error');
@@ -112,39 +118,45 @@ passport.use('local', new LocalStrategy({usernameField: 'email'}, function(usern
 }));
 
 
-passport.use('google-signup', new GoogleStrategy(config.googleAuth,
+passport.use('google-signup', new GoogleStrategy(config.googleSignupAuth,
     function(token, refreshToken, profile, done) {
         console.log('Google profile')
         console.log(profile);
         // make the code asynchronous
         // User.findOne won't fire until we have all our data back from Google
         process.nextTick(function() {
-            console.log('Authenticating using google strategy')
+            console.log('Signup using google strategy')
             // try to find the user based on their google id
             models.GoogleProfile.findOne({where: {id: profile.id}, include: [{ model: models.User }]}).then(function(gp) {
-                models.User.create({email: profile.emails[0].value,
-                                    name: profile.displayName,
-                                    activated: false,
-                                    human: true,
-                                    googleprofile: {
-                                        id: profile.id,
-                                        token: token
-                                    }
-                                },
-                                {
-                                    include: [models.GoogleProfile]
-                                }).then(function(user) {
-                                    return done(null, user);
-                                }).catch(function(err) {
-                                    return done(null, err)
-                                });
+                if(!gp) {
+                    models.User.create({email: profile.emails[0].value,
+                            name: profile.displayName,
+                            active: false,
+                            human: true,
+                            googleprofile: {
+                                id: profile.id,
+                                token: token
+                            }
+                        },
+                        {
+                            include: [models.GoogleProfile]
+                        }).then(function(user) {
+                        console.log('signup success');
+                        return done(null, user);
+                    }).catch(function(err) {
+                        return done(err)
+                    });
+                } else {
+                    return done(null, false);
+                }
+
 
             });
         });
 
     }));
 
-passport.use('google-login', new GoogleStrategy(config.googleAuth,
+passport.use('google-login', new GoogleStrategy(config.googleLoginAuth,
     function(token, refreshToken, profile, done) {
         console.log('Google profile')
         console.log(profile);
@@ -154,11 +166,15 @@ passport.use('google-login', new GoogleStrategy(config.googleAuth,
             console.log('Authenticating using google strategy')
             // try to find the user based on their google id
             models.GoogleProfile.findOne({where: {id: profile.id}, include: [{ model: models.User }]}).then(function(gp) {
-                if(gp) {
-                    console.log('Google login successr');
+                if(gp && gp.user.active) {
+                    console.log('Google login success');
                     console.log(gp.user);
                     return done(null, gp.user);
+                } else if(gp) {
+                    console.log('Google login failed. User not activated.')
+                    return done(null, false);
                 } else {
+                    console.log('Google login failed. Google profile not found')
                     return done(null, false);
                 }
             });
@@ -182,6 +198,66 @@ passport.deserializeUser(function(id, done) {
         done(err, null);
     });
 });
+
+authRouter.get('/google/login', passport.authenticate('google-login', { scope : ['profile', 'email'] }));
+authRouter.get('/google/logincb',
+            passport.authenticate('google-login', {
+                    successRedirect : '/',
+                    failureRedirect : '/auth/login?loginfail=true'
+            }));
+
+authRouter.get('/google/signup', passport.authenticate('google-signup', { scope : ['profile', 'email'] }));
+authRouter.get('/google/signupcb', function(req, res, next) {
+    passport.authenticate('google-signup', function(err,user,info) {
+        if(err) {
+            //Flash a usefull error message
+            console.log('google signup failed throug err')
+            console.log(err)
+            return res.redirect('/auth/login?gsfail=true');
+        }
+        if(!user) {
+            console.log('google signup failed through unknown reason')
+            return res.redirect('/auth/login?gsfail=true')
+        }
+        //Flash a success message, informing the user the account needs to be activated
+        console.log('google signup success')
+        return res.redirect('/auth/login?gsok=true');
+    })(req,res,next);
+});
+
+
+
+authRouter.get('/login', function(req,res) {
+    var data = {
+        error: false,
+        message: ''
+    };
+
+    console.log(req.query);
+
+    if(req.query.gsfail) {
+        data.error = true;
+        data.message = 'Google Sign-up failed.'
+    } else if(req.query.gsok) {
+        data.error = true;
+        data.message = 'Google Sign-up succeeded. In order to use your account your sign-up request has to be approved. You will recieve a message when your account has been approved.'
+    } else if(req.query.inactive) {
+        data.error = true;
+        data.message = 'Your account is not yet activated. Please wait until your account is approved.'
+    } else if(req.query.loginfail) {
+        data.error = true;
+        data.message = 'Login failed. Please make sure you entered a valid email/password combination'
+    }
+    console.log(data)
+    res.render('login.ejs', data);
+});
+
+authRouter.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/auth/login');
+});
+
+authRouter.post('/login', bodyParser(), passport.authenticate('local', { successRedirect: '/', failureRedirect: '/auth/login?loginfail=true' }));
 
 //Auth router routes
 authRouter.post('/apilogin', function(req, res, next) {
@@ -228,41 +304,6 @@ authRouter.post('/apilogin', function(req, res, next) {
 
 
 });
-
-authRouter.get('/google/login', passport.authenticate('google-login', { scope : ['profile', 'email'] }));
-authRouter.get('/google/logincb',
-            passport.authenticate('google-login', {
-                    successRedirect : '/',
-                    failureRedirect : '/auth/login'
-            }));
-
-authRouter.get('/google/signup', passport.authenticate('google-signup', { scope : ['profile', 'email'] }));
-authRouter.get('/google/signupcb', function(req, res, next) {
-    passport.authenticate('google-signup', function(err,user,info) {
-        if(err) {
-            //Flash a usefull error message
-            return res.redirect('/auth/login');
-        }
-        if(!user) {
-            return res.redirect('/auth/login')
-        }
-        //Flash a success message, informing the user the account needs to be activated
-        return res.redirect('/auth/login');
-    })(req,res,next);
-});
-
-
-
-authRouter.get('/login', function(req,res) {
-    res.render('login.ejs');
-});
-
-authRouter.get('/logout', function(req, res) {
-    req.logout();
-    res.redirect('/auth/login');
-});
-
-authRouter.post('/login', bodyParser(), passport.authenticate('local', { successRedirect: '/', failureRedirect: '/auth/login' }));
 
 
 module.exports = {

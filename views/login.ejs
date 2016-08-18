@@ -2,45 +2,50 @@
 <html>
 <head>
     <title>Sixpack Authentication</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.1.2/css/bulma.min.css">
     <style>
         body        { padding-top:80px; }
     </style>
 </head>
 <body>
 <div class="container">
+    <div class="columns">
+        <div class="column"></div>
+        <div class="column is-two-thirds">
+            <h1><span class="fa fa-sign-in"></span> Login</h1>
 
-    <div class="col-sm-6 col-sm-offset-3">
+            <!-- LOGIN FORM -->
+            <form action="/auth/login" method="post">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input class="input control" type="text" name="email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="input control" name="password">
+                </div>
+                <button type="submit" class="button is-active">Login</button>
+            </form>
 
-        <h1><span class="fa fa-sign-in"></span> Login</h1>
+            <p>Login with:</p>
 
-        <!-- LOGIN FORM -->
-        <form action="/auth/login" method="post">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="text" class="form-control" name="email">
+            <a href="/auth/google/login" class="button is-danger"><i class="fa fa-google-plus"></i> Google Login</a>
+
+            <p>Signup with:</p>
+
+            <a href="/auth/google/signup" class="button is-danger"><i class="fa fa-google-plus"></i> Google Sign-up</a>
+
+            <% if (error) { %>
+            <div class="notification is-warning">
+                <%= message %>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" class="form-control" name="password">
-            </div>
+            <% } %>
 
-            <button type="submit" class="btn btn-warning btn-lg">Login</button>
-        </form>
-
-        <hr>
+        </div>
+        <div class="column"></div>
 
     </div>
-    <div class="jumbotron text-center">
-        <h1><span class="fa fa-lock"></span> Node Authentication</h1>
-
-        <p>Login or Register with:</p>
-
-        <a href="/auth/google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google</a>
-
-    </div>
-
 </div>
 </body>
 </html>

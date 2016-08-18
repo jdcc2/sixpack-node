@@ -17,6 +17,7 @@
             </label>
             <input class="input control" type="text" v-model="email">
             <input type="checkbox" class="checkbox control"  v-model="human">Human?
+            <input type="checkbox" class="checkbox control"  v-model="active">Active?
             <label class="label">
                 Current roles
             </label>
@@ -74,6 +75,7 @@
                 name: '',
                 email: '',
                 human: false,
+                active: false,
                 selectedRole: 'sixpackadmin'
             }
 
@@ -92,7 +94,7 @@
                 let notifyClose = this.notifyClose;
                 let setError = this.setError;
                 let onReturn = this.onReturn;
-                this.editUser({id: this.id, name: this.name, email: this.email, human: this.human}).then(function(success){
+                this.editUser({id: this.id, name: this.name, email: this.email, human: this.human, active: this.active}).then(function(success){
                     if(success) {
                         onReturn();
                     } else {
@@ -106,6 +108,7 @@
                 this.name = this.user.name;
                 this.email = this.user.email;
                 this.human = this.user.human;
+                this.active = this.user.active;
             },
             doDeleteUserRole(event) {
                 let setError = this.setError;
