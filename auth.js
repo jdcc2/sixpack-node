@@ -112,7 +112,39 @@ passport.use('local', new LocalStrategy({usernameField: 'email'}, function(usern
 }));
 
 
-passport.use('google', new GoogleStrategy(config.googleAuth,
+passport.use('google-signup', new GoogleStrategy(config.googleAuth,
+    function(token, refreshToken, profile, done) {
+        console.log('Google profile')
+        console.log(profile);
+        // make the code asynchronous
+        // User.findOne won't fire until we have all our data back from Google
+        process.nextTick(function() {
+            console.log('Authenticating using google strategy')
+            // try to find the user based on their google id
+            models.GoogleProfile.findOne({where: {id: profile.id}, include: [{ model: models.User }]}).then(function(gp) {
+                models.User.create({email: profile.emails[0].value,
+                                    name: profile.displayName,
+                                    activated: false,
+                                    human: true,
+                                    googleprofile: {
+                                        id: profile.id,
+                                        token: token
+                                    }
+                                },
+                                {
+                                    include: [models.GoogleProfile]
+                                }).then(function(user) {
+                                    return done(null, user);
+                                }).catch(function(err) {
+                                    return done(null, err)
+                                });
+
+            });
+        });
+
+    }));
+
+passport.use('google-login', new GoogleStrategy(config.googleAuth,
     function(token, refreshToken, profile, done) {
         console.log('Google profile')
         console.log(profile);
@@ -123,28 +155,16 @@ passport.use('google', new GoogleStrategy(config.googleAuth,
             // try to find the user based on their google id
             models.GoogleProfile.findOne({where: {id: profile.id}, include: [{ model: models.User }]}).then(function(gp) {
                 if(gp) {
-                    console.log('GP user')
+                    console.log('Google login successr');
                     console.log(gp.user);
                     return done(null, gp.user);
                 } else {
-                    models.User.create({email: profile.emails[0].value,
-                                        name: profile.displayName,
-                                        googleprofile: {
-                                            id: profile.id,
-                                            token: token
-                                        }
-                                    },
-                                    {
-                                        include: [models.GoogleProfile]
-                                    }).then(function(user) {
-                                        return done(null, user);
-                                    });
+                    return done(null, false);
                 }
             });
         });
 
     }));
-
 
 passport.serializeUser(function(user, done) {
     done(null, user.id);
@@ -209,12 +229,28 @@ authRouter.post('/apilogin', function(req, res, next) {
 
 });
 
-authRouter.get('/google', passport.authenticate('google', { scope : ['profile', 'email'] }));
-authRouter.get('/googlecb',
-            passport.authenticate('google', {
+authRouter.get('/google/login', passport.authenticate('google-login', { scope : ['profile', 'email'] }));
+authRouter.get('/google/logincb',
+            passport.authenticate('google-login', {
                     successRedirect : '/',
                     failureRedirect : '/auth/login'
             }));
+
+authRouter.get('/google/signup', passport.authenticate('google-signup', { scope : ['profile', 'email'] }));
+authRouter.get('/google/signupcb', function(req, res, next) {
+    passport.authenticate('google-signup', function(err,user,info) {
+        if(err) {
+            //Flash a usefull error message
+            return res.redirect('/auth/login');
+        }
+        if(!user) {
+            return res.redirect('/auth/login')
+        }
+        //Flash a success message, informing the user the account needs to be activated
+        return res.redirect('/auth/login');
+    })(req,res,next);
+});
+
 
 
 authRouter.get('/login', function(req,res) {
