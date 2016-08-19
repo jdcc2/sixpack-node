@@ -181,13 +181,17 @@ var models = {
                 min: 0
             }
         },
-        // time: {
-        //     type: Sequelize.DATE,
-        //     allowNull: false
-        // },
-        // userId: {
-        //     type: Sequelize.INTEGER
-        // }
+        ///These foreign keys are created by the function calls below, but constraints on uniqueness are set here
+        userId: {
+            type: Sequelize.INTEGER,
+            unique: 'consumptioncomb',
+            allowNull: false
+        },
+        consumableId: {
+            type: Sequelize.STRING,
+            unique: 'consumptioncomb',
+            allowNull: false
+        },
         amount: {
             type: Sequelize.INTEGER,
             allowNull: false,
