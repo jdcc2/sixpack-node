@@ -24,7 +24,14 @@ var config = {
         enabled: true
     },
     baseURL: null,
-    port: 3000
+    port: 3000,
+    database: {
+        postgres: false,
+        postgresHost: 'postgres',
+        postgresUser: 'sixpack',
+        postgresPassword: 'sixpack',
+        postgresDatabase: 'sixpack'
+    }
 
 };
 
