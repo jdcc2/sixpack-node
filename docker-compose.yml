@@ -1,0 +1,8 @@
+version: '2'
+services:
+  db:
+    image: postgres
+  web:
+    image: sixpack
+    depends_on:
+      - db
