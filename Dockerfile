@@ -1,4 +1,4 @@
-FROM nodesource:xenial:argon
+FROM nodesource/xenial:argon
 RUN mkdir -p /opt/sixpack
 WORKDIR /opt/sixpack
 COPY package.json /opt/sixpack

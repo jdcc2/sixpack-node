@@ -15,7 +15,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-      ports:
+    ports:
         - "3000:3000"
     depends_on:
       - sixpackpsql
