@@ -27,7 +27,7 @@ var config = {
     port: 3000,
     database: {
         postgres: false,
-        postgresHost: 'postgres',
+        postgresHost: 'sixpackpsql',
         postgresUser: 'sixpack',
         postgresPassword: 'sixpack',
         postgresDatabase: 'sixpack'
@@ -40,7 +40,8 @@ var defaultUserConfig = {
     googleClientID: null,
     googleClientSecret: null,
     baseURL: null,
-    port: null
+    port: null,
+    postgres: true
 };
 
 //TODO implement config schema checking
@@ -81,6 +82,14 @@ if(defaultUserConfig.baseURL == null) {
 } else {
     config.baseURL = defaultUserConfig.baseURL;
 }
+
+if(defaultUserConfig.postgres === false) {
+    console.log('WARNING: using default local sqlite database sixpackdb.sqlite')
+} else {
+    console.log('Using PostgreSQL database')
+    config.database.postgres = true;
+}
+
 console.log(config);
 
 module.exports = config;

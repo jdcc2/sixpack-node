@@ -1,8 +1,21 @@
 version: '2'
 services:
-  db:
+  sixpackpsql:
     image: postgres
-  web:
-    image: sixpack
+    volumes:
+      - /datam/sixpackdb:/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: sixpack
+      POSTGRES_USER: sixpack
+      POSTGRES_DB: sixpack
+      PGDATA: /var/lib/postgresql/data/pgdata
+  sixpackapp:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+      ports:
+        - "3000:3000"
     depends_on:
-      - db
+      - sixpackpsql

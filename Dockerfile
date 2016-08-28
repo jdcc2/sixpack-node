@@ -1,4 +1,3 @@
-#
 FROM nodesource:xenial:argon
 RUN mkdir -p /opt/sixpack
 WORKDIR /opt/sixpack

@@ -1,5 +1,5 @@
 Sequelize = require('sequelize')
-config = require('config').database
+config = require('./config.js').database
 
 var sequelize = null;
 if(config.postgres) {
