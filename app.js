@@ -164,4 +164,4 @@ sequelize.authenticate().then(function() {
 
 
 
-app.listen(config.port);
+app.listen(config.port, '0.0.0.0');

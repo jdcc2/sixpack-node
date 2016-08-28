@@ -188,7 +188,7 @@ var models = {
             allowNull: false
         },
         consumableId: {
-            type: Sequelize.STRING,
+            type: Sequelize.INTEGER,
             unique: 'consumptioncomb',
             allowNull: false
         },

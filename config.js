@@ -28,6 +28,7 @@ var config = {
     database: {
         postgres: false,
         postgresHost: 'sixpackpsql',
+	postgresPort: 5432,
         postgresUser: 'sixpack',
         postgresPassword: 'sixpack',
         postgresDatabase: 'sixpack'
