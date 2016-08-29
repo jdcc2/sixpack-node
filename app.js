@@ -64,9 +64,16 @@ _.each(controllers, function(controller) {
 
 //Protect the root router from unauthenticated requests
 router.use(auth.authCheck);
-router.get('/', function(req, res) {
-    res.render('index.ejs');
-});
+if(config.proxyURLSuffix) {
+    router.get(`/${config.proxyURLSuffix}`, function(req, res) {
+        res.render('index.ejs');
+    });
+} else {
+    router.get('/', function(req, res) {
+        res.render('index.ejs');
+    });
+}
+
 router.all('*', function(res, req, next) {
     next(new errors.ResourceNotFoundError('URL not found'));
 })
