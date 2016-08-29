@@ -66,7 +66,10 @@ _.each(controllers, function(controller) {
 router.use(auth.authCheck);
 
 router.get('/', function(req, res) {
-    res.render('index.ejs');
+    var data = {
+        baseURl: config.baseURL
+    };
+    res.render('index.ejs', data);
 });
 
 router.all('*', function(res, req, next) {
@@ -95,7 +98,12 @@ app.use(passport.session());
 app.use(morgan('dev'));
 
 //Serve static filesi in 'static' dir under '/static'
-app.use('/static', express.static('static'))
+if(config.proxyURLSuffix) {
+    app.use(`/${config.proxyURLSuffix}/static`, express.static('static'))
+} else {
+    app.use('/static', express.static('static'))
+}
+
 
 //Routers
 if(config.proxyURLSuffix) {
