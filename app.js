@@ -67,7 +67,7 @@ router.use(auth.authCheck);
 
 router.get('/', function(req, res) {
     var data = {
-        baseURl: config.baseURL
+        baseURL: config.baseURL
     };
     res.render('index.ejs', data);
 });
