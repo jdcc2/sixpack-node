@@ -60,7 +60,7 @@ function authCheck(req, res, next) {
         next();
     } else {
         console.log('redirecting to login')
-        res.redirect('/auth/login')
+        res.redirect(`${config.baseURL}/auth/login`)
     }
 }
 
@@ -211,8 +211,8 @@ if(config.googleAuth.enabled) {
     authRouter.get('/google/login', passport.authenticate('google-login', { scope : ['profile', 'email'] }));
     authRouter.get('/google/logincb',
         passport.authenticate('google-login', {
-            successRedirect : '/',
-            failureRedirect : '/auth/login?loginfail=true'
+            successRedirect : `${config.baseURL}`,
+            failureRedirect : `${config.baseURL}/auth/login?loginfail=true`
         }));
 
     authRouter.get('/google/signup', passport.authenticate('google-signup', { scope : ['profile', 'email'] }));
@@ -222,15 +222,15 @@ if(config.googleAuth.enabled) {
                 //Flash a usefull error message
                 console.log('google signup failed throug err')
                 console.log(err)
-                return res.redirect('/auth/login?gsfail=true');
+                return res.redirect(`${config.baseURL}/auth/login?gsfail=true`)
             }
             if(!user) {
                 console.log('google signup failed through unknown reason')
-                return res.redirect('/auth/login?gsfail=true')
+                return res.redirect(`${config.baseURL}/auth/login?gsfail=true`)
             }
             //Flash a success message, informing the user the account needs to be activated
             console.log('google signup success')
-            return res.redirect('/auth/login?gsok=true');
+            return res.redirect(`${config.baseURL}/auth/login?gsok=true`);
         })(req,res,next);
     });
 }
@@ -264,7 +264,7 @@ authRouter.get('/login', function(req,res) {
 
 authRouter.get('/logout', function(req, res) {
     req.logout();
-    res.redirect('/auth/login');
+    res.redirect(`${config.baseURL}/auth/login`);
 });
 
 authRouter.post('/login', bodyParser(), passport.authenticate('local', { successRedirect: '/', failureRedirect: '/auth/login?loginfail=true' }));
