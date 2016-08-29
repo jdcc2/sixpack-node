@@ -11,8 +11,9 @@ const state = {
     admin: false,
     beeradmin: false,
     config: {
-        api_url : 'http://localhost:3000/api',
-        url: 'http://localhost:3000'
+        //WARNING: the URL determination works because the webapp is loaded on the root URL of the API server, server side configuration (via javascript global) might be better in certain cases
+        api_url : `${window.location.pathname}/api`,
+        url: window.location.pathname
         //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
     },
     users: {},

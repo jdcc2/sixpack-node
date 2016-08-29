@@ -24,6 +24,7 @@ var config = {
         enabled: true
     },
     baseURL: null,
+    proxyURLSuffix: null,
     port: 3000,
     database: {
         postgres: false,
@@ -41,6 +42,8 @@ var defaultUserConfig = {
     googleClientID: null,
     googleClientSecret: null,
     baseURL: null,
+    proxyURLSuffix: null,
+    hostURL: null,
     port: null,
     postgres: true
 };
@@ -77,11 +80,17 @@ if(defaultUserConfig.port == null) {
     config.port = defaultUserConfig.port;
 }
 
-if(defaultUserConfig.baseURL == null) {
+if(defaultUserConfig.hostURL == null) {
     console.log('WARNING: Using default baseURL http://localhost:[port]')
     config.baseURL = `http://localhost:${config.port}`
 } else {
-    config.baseURL = defaultUserConfig.baseURL;
+    config.baseURL = defaultUserConfig.hostURL;
+}
+
+//Add the URL suffix that should be added to to the host URL (for reverse proxies)
+if(defaultUserConfig.proxyURLSuffix != null) {
+    config.proxyURLSuffix = defaultUserConfig.proxyURLSuffix;
+    config.baseURL = `${config.baseURL}/${defaultUserConfig.proxyURLSuffix}`;
 }
 
 if(defaultUserConfig.postgres === false) {

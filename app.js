@@ -96,9 +96,17 @@ app.use(morgan('dev'));
 app.use('/static', express.static('static'))
 
 //Routers
-app.use('/api', apiRouter);
-app.use('/auth', auth.authRouter);
-app.use('/', router); //This one should be specified last because it contains a catch-all route
+if(config.proxyURLSuffix) {
+    app.use(`/${config.proxyURLSuffix}/api`, apiRouter);
+    app.use(`/${config.proxyURLSuffix}/auth`, auth.authRouter);
+    app.use(`/${config.proxyURLSuffix}`, router); //This one should be specified last because it contains a catch-all route
+
+} else {
+    app.use('/api', apiRouter);
+    app.use('/auth', auth.authRouter);
+    app.use('/', router); //This one should be specified last because it contains a catch-all route
+
+}
 
 
 

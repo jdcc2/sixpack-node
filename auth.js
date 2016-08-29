@@ -243,7 +243,8 @@ authRouter.get('/login', function(req,res) {
     var data = {
         error: false,
         message: '',
-        gauth: config.googleAuth.enabled
+        gauth: config.googleAuth.enabled,
+        baseURL: config.baseURL
     };
 
     if(req.query.gsfail) {
@@ -267,7 +268,7 @@ authRouter.get('/logout', function(req, res) {
     res.redirect(`${config.baseURL}/auth/login`);
 });
 
-authRouter.post('/login', bodyParser(), passport.authenticate('local', { successRedirect: '/', failureRedirect: '/auth/login?loginfail=true' }));
+authRouter.post('/login', bodyParser(), passport.authenticate('local', { successRedirect: `${config.baseURL}`, failureRedirect: `${config.baseURL}/auth/login?loginfail=true` }));
 
 //Auth router routes
 authRouter.post('/apilogin', function(req, res, next) {

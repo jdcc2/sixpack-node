@@ -15714,6 +15714,9 @@
 	            currentUser: _getters.getCurrentUser,
 	            admin: function admin(state) {
 	                return state.admin;
+	            },
+	            url: function url(state) {
+	                return state.config.url;
 	            }
 	        }
 	    },
@@ -15721,6 +15724,11 @@
 	        this.fetchCurrentUser();
 	    },
 	
+	    computed: {
+	        logoutURL: function logoutURL() {
+	            return this.url + '/auth/logout';
+	        }
+	    },
 	    store: _store2.default
 	};
 
@@ -15756,8 +15764,9 @@
 	    admin: false,
 	    beeradmin: false,
 	    config: {
-	        api_url: 'http://localhost:3000/api',
-	        url: 'http://localhost:3000'
+	        //WARNING: the URL determination works because the webapp is loaded on the root URL of the API server, server side configuration (via javascript global) might be better in certain cases
+	        api_url: window.location.pathname + '/api',
+	        url: window.location.pathname
 	        //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
 	    },
 	    users: {},
@@ -17652,7 +17661,7 @@
 /* 35 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div style=\"margin-left: 20px; margin-right: 20px;\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"/auth/logout\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div style=\"margin-top: 20px\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
+	module.exports = "\n<div style=\"margin-left: 20px; margin-right: 20px;\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"{{ logoutURL }}\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div style=\"margin-top: 20px\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
 
 /***/ },
 /* 36 */

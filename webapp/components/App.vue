@@ -23,7 +23,7 @@
             <div class="nav-right nav-menu">
                 <a class="nav-item is-tab" v-link="{path: '/', exact: true}">Home</a>
                 <a class="nav-item is-tab" v-if="admin" v-link="{path: '/admin'}">Admin</a>
-                <a class="nav-item" href="/auth/logout">Logout</a>
+                <a class="nav-item" href="{{ logoutURL }}">Logout</a>
                 <span></span>
             </div>
         </div>
@@ -49,11 +49,17 @@
             },
             getters: {
                 currentUser : getCurrentUser,
-                admin: function(state) {return state.admin;}
+                admin: function(state) {return state.admin;},
+                url: function(state) {return state.config.url}
             }
         },
         created() {
             this.fetchCurrentUser();
+        },
+        computed: {
+            logoutURL: function() {
+                return `${this.url}/auth/logout`;
+            }
         },
         store
     }
