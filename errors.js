@@ -1,5 +1,9 @@
 'use strict';
 
+var JWT = require('jwt-async')
+var Sequelize = require('sequelize')
+var _ = require('underscore')
+
 function ResourceNotFoundError() {
     Error.captureStackTrace(this, this.constructor);
     this.error = this.constructor.name;
