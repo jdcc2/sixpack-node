@@ -8,6 +8,7 @@
              </p>
         </div>
         <div class="card-content">
+            <p class="title is-3">General Info</p>
             <label class="label">
                 Name
             </label>
@@ -18,6 +19,19 @@
             <input class="input control" type="text" v-model="email">
             <input type="checkbox" class="checkbox control"  v-model="human">Human?
             <input type="checkbox" class="checkbox control"  v-model="active">Active?
+            <p class="control">
+                <button class="button" @click="doEdit">Save</button>
+                <button class="button" @click="onReturn">Cancel</button>
+            </p>
+            <p class="title is-3">Change password</p>
+            <label class="label">
+                Password
+            </label>
+            <input class="input control" type="text" v-model="password">
+            <p class="control">
+                <button class="button" @click="doUpdatePw">Update</button>
+            </p>
+            <p class="title is-3">Update roles</p>
             <label class="label">
                 Current roles
             </label>
@@ -38,10 +52,7 @@
                 <button class="button" @click="doAddUserRole">Add role</button>
             </p>
 
-            <p class="control">
-                <button class="button" @click="doEdit">Save</button>
-                <button class="button" @click="onReturn">Cancel</button>
-            </p>
+
             <div class="notification is-danger" v-if="error">
                 {{ errorMessage }}
             </div>
@@ -51,7 +62,7 @@
 </template>
 
 <script>
-    import {editUser, fetchUsers, deleteUserRole, createUserRole} from '../../actions'
+    import {editUser, fetchUsers, deleteUserRole, createUserRole, updateUserPassword} from '../../actions'
     import {getUsers} from '../../getters'
     import _ from 'underscore'
 
@@ -61,7 +72,8 @@
                 editUser,
                 fetchUsers,
                 deleteUserRole,
-                createUserRole
+                createUserRole,
+                updateUserPassword
             },
             getters: {
                 users: getUsers
@@ -74,6 +86,7 @@
                 id: '',
                 name: '',
                 email: '',
+                password: '',
                 human: false,
                 active: false,
                 selectedRole: 'sixpackadmin'
@@ -94,7 +107,7 @@
                 let notifyClose = this.notifyClose;
                 let setError = this.setError;
                 let onReturn = this.onReturn;
-                this.editUser({id: this.id, name: this.name, email: this.email, human: this.human, active: this.active}).then(function(success){
+                this.editUser({id: this.id, name: this.name, email: this.email, password: this.password, human: this.human, active: this.active}).then(function(success){
                     if(success) {
                         onReturn();
                     } else {
@@ -107,6 +120,7 @@
                 this.id = this.user.id;
                 this.name = this.user.name;
                 this.email = this.user.email;
+                this.password = '';
                 this.human = this.user.human;
                 this.active = this.user.active;
             },
@@ -135,6 +149,17 @@
                     });
                 }
 
+            },
+            doUpdatePw() {
+                let setError = this.setError;
+                let loadUser = this.loadUser;
+                this.updateUserPassword(this.id, this.password).then(function(success) {
+                    if(success) {
+                        loadUser();
+                    } else {
+                        setError('Error updating password');
+                    }
+                })
             },
             setError(errorMessage) {
                 this.error = true;

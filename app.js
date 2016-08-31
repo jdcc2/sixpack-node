@@ -95,7 +95,7 @@ sequelize.authenticate().then(function() {
     } else {
         //Check if the primary admin account is still OK
         var currentUserRoles = _.pluck(admin.userroles, 'roleId');
-        if(!_.contains(currentUserRoles, 'sixpackadmin')) {
+        if(!_.contains(currentUserRoles, 'sixpackadmin') || !admin.active) {
             console.log("WARNING: The primary admin account was not found.")
         }
     }

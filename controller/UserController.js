@@ -16,20 +16,30 @@ function UserController(route, model, options) {
 
 //Handles deletion of properties of Arrays of Sequelize Instance objects and single Instance objects based on the returnExclude list
 UserController.prototype.prepReturn = function(resources) {
-    if(_.isArray(this.options.returnExclude)) {
-        console.log('deleting parameters before return');
-        _.each(this.options.returnExclude, function(propName) {
-            if(_.isArray(resources)) {
-                _.each(resources, function(item, index) {
-                    delete resources[index]['dataValues'][propName];
-                });
-            } else {
-                console.log(typeof resources);
-                delete resources['dataValues'][propName];
-            }
-
+    console.log(`resource clean: ${resources}`)
+    if(_.isArray(resources)) {
+        _.each(resources, function(item, index) {
+            delete resources[index]['dataValues']['localprofile']['dataValues']['password'];
+            console.log(resources[index])
         });
+    } else {
+        delete resources['dataValues']['localprofile']['dataValues']['password'];
     }
+
+    // if(_.isArray(this.options.returnExclude)) {
+    //     console.log('deleting parameters before return');
+    //     _.each(this.options.returnExclude, function(propName) {
+    //         if(_.isArray(resources)) {
+    //             _.each(resources, function(item, index) {
+    //                 delete resources[index]['dataValues'][propName];
+    //             });
+    //         } else {
+    //             console.log(typeof resources);
+    //             delete resources['dataValues'][propName];
+    //         }
+    //
+    //     });
+    // }
 }
 
 //Handles deletion of properties of Arrays of Objects and single Objects based on the updateExclude list
@@ -55,7 +65,6 @@ UserController.prototype.getAll = function(req, res, next) {
     this.authorize('get', req.user, null).then(function() {
         return model.findAll({ include: [{ all: true, nested: true }]});
     }).then(function(resources){
-        console.log('getting consumables');
         prepReturn(resources);
         var resourcesObject = {};
         _.each(resources, function(value) {
@@ -189,6 +198,27 @@ UserController.prototype.createLocal = function(req, res, next) {
         next(err);
     });
 
+}
+
+UserController.prototype.updatePassword = function(req, res, next) {
+    var prepReturn = this.prepReturn.bind(this);
+    var model = this.model;
+    this.prepUpdate(req.body);
+
+    this.authorize('post', req.user, req.params.id).then(function() {
+        return model.findById(req.params.id, { include: [{ all: true, nested: true }]});
+    }).then(function(resource){
+        if(resource.localprofile) {
+            return resource.localprofile.update({password: req.body.password});
+        } else {
+            throw new errors.ResourceNotFoundError();
+        }
+
+    }).then(function() {
+        res.json(new Response());
+    }).catch(function(err) {
+        next(err);
+    });
 }
 
 UserController.prototype.authorizeRead = function(req, res, next){

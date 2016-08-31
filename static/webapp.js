@@ -15894,7 +15894,7 @@
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.createAPIToken = exports.deleteAPIToken = exports.createConsumption = exports.deleteConsumption = exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.editUser = exports.fetchUsers = exports.fetchCurrentUser = exports.showMessage = undefined;
+	exports.createAPIToken = exports.deleteAPIToken = exports.createConsumption = exports.deleteConsumption = exports.createConsumable = exports.fetchConsumables = exports.fetchConsumptions = exports.deleteUserRole = exports.createUserRole = exports.createUser = exports.deleteUser = exports.updateUserPassword = exports.editUser = exports.fetchUsers = exports.fetchCurrentUser = exports.showMessage = undefined;
 	
 	var _axios = __webpack_require__(16);
 	
@@ -15916,7 +15916,6 @@
 	    var state = _ref2.state;
 	
 	    console.log('fetchcurrentusers');
-	    console.log(state.config.api_url);
 	    (0, _axios2.default)({
 	        method: 'get',
 	        url: state.config.api_url + '/currentuser',
@@ -16039,9 +16038,50 @@
 	    });
 	};
 	
-	var deleteUser = exports.deleteUser = function deleteUser(_ref5, user) {
+	var updateUserPassword = exports.updateUserPassword = function updateUserPassword(_ref5, userid, password) {
 	    var dispatch = _ref5.dispatch;
 	    var state = _ref5.state;
+	
+	    console.log('user updatepw');
+	    return (0, _axios2.default)({
+	        method: 'post',
+	        url: state.config.api_url + '/users/' + userid + '/updatepw',
+	        headers: {
+	            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+	        },
+	        data: JSON.stringify({ password: password }),
+	        responseType: 'json'
+	
+	    }).then(function (response) {
+	        console.log("user updatepw returned");
+	        console.log(response);
+	        if (response.data.ok === true) {
+	            console.log('updated user pw');
+	            return true;
+	        } else {
+	            console.log("could not update user pw");
+	            return false;
+	        }
+	    }).catch(function (response) {
+	        if (response instanceof Error) {
+	            // Something happened in setting up the request that triggered an Error
+	            console.log('Error', response.message);
+	        } else {
+	            // The request was made, but the server responded with a status code
+	            // that falls out of the range of 2xx
+	            console.log("failed pw update");
+	            console.log(response.data);
+	            console.log(response.status);
+	            console.log(response.headers);
+	            console.log(response.config);
+	        }
+	        return false;
+	    });
+	};
+	
+	var deleteUser = exports.deleteUser = function deleteUser(_ref6, user) {
+	    var dispatch = _ref6.dispatch;
+	    var state = _ref6.state;
 	
 	    console.log('user delete');
 	    return (0, _axios2.default)({
@@ -16079,9 +16119,9 @@
 	    });
 	};
 	
-	var createUser = exports.createUser = function createUser(_ref6, user) {
-	    var dispatch = _ref6.dispatch;
-	    var state = _ref6.state;
+	var createUser = exports.createUser = function createUser(_ref7, user) {
+	    var dispatch = _ref7.dispatch;
+	    var state = _ref7.state;
 	
 	    console.log('user create');
 	    console.log(user);
@@ -16121,9 +16161,9 @@
 	    });
 	};
 	
-	var createUserRole = exports.createUserRole = function createUserRole(_ref7, userId, roleId) {
-	    var dispatch = _ref7.dispatch;
-	    var state = _ref7.state;
+	var createUserRole = exports.createUserRole = function createUserRole(_ref8, userId, roleId) {
+	    var dispatch = _ref8.dispatch;
+	    var state = _ref8.state;
 	
 	    console.log('userrole create');
 	    console.log(userId);
@@ -16164,9 +16204,9 @@
 	    });
 	};
 	
-	var deleteUserRole = exports.deleteUserRole = function deleteUserRole(_ref8, userrole) {
-	    var dispatch = _ref8.dispatch;
-	    var state = _ref8.state;
+	var deleteUserRole = exports.deleteUserRole = function deleteUserRole(_ref9, userrole) {
+	    var dispatch = _ref9.dispatch;
+	    var state = _ref9.state;
 	
 	    console.log('userrole delete');
 	    return (0, _axios2.default)({
@@ -16204,9 +16244,9 @@
 	    });
 	};
 	
-	var fetchConsumptions = exports.fetchConsumptions = function fetchConsumptions(_ref9) {
-	    var dispatch = _ref9.dispatch;
-	    var state = _ref9.state;
+	var fetchConsumptions = exports.fetchConsumptions = function fetchConsumptions(_ref10) {
+	    var dispatch = _ref10.dispatch;
+	    var state = _ref10.state;
 	
 	    console.log('fetchConsumptions');
 	    (0, _axios2.default)({
@@ -16242,9 +16282,9 @@
 	    });
 	};
 	
-	var fetchConsumables = exports.fetchConsumables = function fetchConsumables(_ref10) {
-	    var dispatch = _ref10.dispatch;
-	    var state = _ref10.state;
+	var fetchConsumables = exports.fetchConsumables = function fetchConsumables(_ref11) {
+	    var dispatch = _ref11.dispatch;
+	    var state = _ref11.state;
 	
 	    console.log('fetchConsumables');
 	    (0, _axios2.default)({
@@ -16280,9 +16320,9 @@
 	    });
 	};
 	
-	var createConsumable = exports.createConsumable = function createConsumable(_ref11, name, description) {
-	    var dispatch = _ref11.dispatch;
-	    var state = _ref11.state;
+	var createConsumable = exports.createConsumable = function createConsumable(_ref12, name, description) {
+	    var dispatch = _ref12.dispatch;
+	    var state = _ref12.state;
 	
 	    console.log('consumable create');
 	    return (0, _axios2.default)({
@@ -16321,9 +16361,9 @@
 	    });
 	};
 	
-	var deleteConsumption = exports.deleteConsumption = function deleteConsumption(_ref12, consumption) {
-	    var dispatch = _ref12.dispatch;
-	    var state = _ref12.state;
+	var deleteConsumption = exports.deleteConsumption = function deleteConsumption(_ref13, consumption) {
+	    var dispatch = _ref13.dispatch;
+	    var state = _ref13.state;
 	
 	    console.log('consumption delete');
 	    return (0, _axios2.default)({
@@ -16361,9 +16401,9 @@
 	    });
 	};
 	
-	var createConsumption = exports.createConsumption = function createConsumption(_ref13, userId, consumableId, amount) {
-	    var dispatch = _ref13.dispatch;
-	    var state = _ref13.state;
+	var createConsumption = exports.createConsumption = function createConsumption(_ref14, userId, consumableId, amount) {
+	    var dispatch = _ref14.dispatch;
+	    var state = _ref14.state;
 	
 	    console.log('consumption create');
 	    return (0, _axios2.default)({
@@ -16402,9 +16442,9 @@
 	    });
 	};
 	
-	var deleteAPIToken = exports.deleteAPIToken = function deleteAPIToken(_ref14, jwt) {
-	    var dispatch = _ref14.dispatch;
-	    var state = _ref14.state;
+	var deleteAPIToken = exports.deleteAPIToken = function deleteAPIToken(_ref15, jwt) {
+	    var dispatch = _ref15.dispatch;
+	    var state = _ref15.state;
 	
 	    console.log('consumption delete');
 	    return (0, _axios2.default)({
@@ -16442,9 +16482,9 @@
 	    });
 	};
 	
-	var createAPIToken = exports.createAPIToken = function createAPIToken(_ref15, email, password) {
-	    var dispatch = _ref15.dispatch;
-	    var state = _ref15.state;
+	var createAPIToken = exports.createAPIToken = function createAPIToken(_ref16, email, password) {
+	    var dispatch = _ref16.dispatch;
+	    var state = _ref16.state;
 	
 	    console.log('consumption create');
 	    return (0, _axios2.default)({
@@ -17829,7 +17869,8 @@
 	            editUser: _actions.editUser,
 	            fetchUsers: _actions.fetchUsers,
 	            deleteUserRole: _actions.deleteUserRole,
-	            createUserRole: _actions.createUserRole
+	            createUserRole: _actions.createUserRole,
+	            updateUserPassword: _actions.updateUserPassword
 	        },
 	        getters: {
 	            users: _getters.getUsers
@@ -17842,6 +17883,7 @@
 	            id: '',
 	            name: '',
 	            email: '',
+	            password: '',
 	            human: false,
 	            active: false,
 	            selectedRole: 'sixpackadmin'
@@ -17862,7 +17904,7 @@
 	            var notifyClose = this.notifyClose;
 	            var setError = this.setError;
 	            var onReturn = this.onReturn;
-	            this.editUser({ id: this.id, name: this.name, email: this.email, human: this.human, active: this.active }).then(function (success) {
+	            this.editUser({ id: this.id, name: this.name, email: this.email, password: this.password, human: this.human, active: this.active }).then(function (success) {
 	                if (success) {
 	                    onReturn();
 	                } else {
@@ -17874,6 +17916,7 @@
 	            this.id = this.user.id;
 	            this.name = this.user.name;
 	            this.email = this.user.email;
+	            this.password = '';
 	            this.human = this.user.human;
 	            this.active = this.user.active;
 	        },
@@ -17902,6 +17945,17 @@
 	                });
 	            }
 	        },
+	        doUpdatePw: function doUpdatePw() {
+	            var setError = this.setError;
+	            var loadUser = this.loadUser;
+	            this.updateUserPassword(this.id, this.password).then(function (success) {
+	                if (success) {
+	                    loadUser();
+	                } else {
+	                    setError('Error updating password');
+	                }
+	            });
+	        },
 	        setError: function setError(errorMessage) {
 	            this.error = true;
 	            this.errorMessage = errorMessage;
@@ -17917,7 +17971,7 @@
 /* 41 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n\n         <p class=\"card-header-title\">\n             <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"active\">Active?\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
+	module.exports = "\n<div class=\"card is-fullwidth\">\n    <div class=\"card-header\">\n\n         <p class=\"card-header-title\">\n             <a v-link=\"{path: '/admin/users'}\"><i class=\"fa fa-arrow-left\"></i></a><span style=\"width: 20px;\"></span>\n             Edit user {{ id }}\n         </p>\n    </div>\n    <div class=\"card-content\">\n        <p class=\"title is-3\">General Info</p>\n        <label class=\"label\">\n            Name\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"name\">\n        <label class=\"label\">\n            E-mail\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"email\">\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"human\">Human?\n        <input type=\"checkbox\" class=\"checkbox control\"  v-model=\"active\">Active?\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doEdit\">Save</button>\n            <button class=\"button\" @click=\"onReturn\">Cancel</button>\n        </p>\n        <p class=\"title is-3\">Change password</p>\n        <label class=\"label\">\n            Password\n        </label>\n        <input class=\"input control\" type=\"text\" v-model=\"password\">\n        <p class=\"control\">\n            <button class=\"button\" @click=\"doUpdatePw\">Update</button>\n        </p>\n        <p class=\"title is-3\">Update roles</p>\n        <label class=\"label\">\n            Current roles\n        </label>\n        <span class=\"tag is-large\" v-for=\"role in user.userroles\">\n            <span>{{ role.roleId }}</span>\n            <button class=\"button delete\" v-bind:index=\"$index\" @click=\"doDeleteUserRole\"></button>\n        </span>\n        <label class=\"label\">\n            Add role\n        </label>\n        <p class=\"control\">\n            <span class=\"select\">\n                <select v-model=\"selectedRole\">\n                    <option>sixpackadmin</option>\n                    <option>beeradmin</option>\n                </select>\n            </span>\n            <button class=\"button\" @click=\"doAddUserRole\">Add role</button>\n        </p>\n\n\n        <div class=\"notification is-danger\" v-if=\"error\">\n            {{ errorMessage }}\n        </div>\n    </div>\n\n</div>\n";
 
 /***/ },
 /* 42 */

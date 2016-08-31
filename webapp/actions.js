@@ -129,6 +129,46 @@ export const editUser = function({dispatch, state}, user) {
     });
 };
 
+export const updateUserPassword = function({dispatch, state}, userid, password) {
+    console.log('user updatepw')
+    return axios({
+        method: 'post',
+        url: `${state.config.api_url}/users/${userid}/updatepw`,
+        headers: {
+            "Content-Type": "application/json" //Prevent preflighting for CORS requests
+        },
+        data : JSON.stringify({password: password}),
+        responseType: 'json'
+
+    }).then((response) => {
+        console.log("user updatepw returned")
+        console.log(response);
+        if(response.data.ok === true) {
+            console.log('updated user pw')
+            return true;
+        } else {
+            console.log("could not update user pw");
+            return false;
+        }
+
+    }).catch(function(response) {
+        if (response instanceof Error) {
+            // Something happened in setting up the request that triggered an Error
+            console.log('Error', response.message);
+
+        } else {
+            // The request was made, but the server responded with a status code
+            // that falls out of the range of 2xx
+            console.log("failed pw update");
+            console.log(response.data);
+            console.log(response.status);
+            console.log(response.headers);
+            console.log(response.config);
+        }
+        return false;
+    });
+};
+
 export const deleteUser = function({dispatch, state}, user) {
     console.log('user delete')
     return axios({
