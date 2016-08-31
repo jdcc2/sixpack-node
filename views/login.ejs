@@ -53,17 +53,14 @@
 
         </div>
     </form>
+    <% if (gauth) { %>
     <div class="logincontainer">
-        <% if (gauth) { %>
-
         <p class="title is-5">Or sign up with:</p>
         <div>
             <a href="/auth/google/signup" class="button is-danger"><i class="fa fa-google-plus"></i>Google</a>
         </div>
-
-        <% } %>
-
     </div>
+    <% } %>
 </div>
 
 

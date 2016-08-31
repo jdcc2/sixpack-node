@@ -78,8 +78,20 @@ sequelize.authenticate().then(function() {
     console.log('Checking admin account...')
     return models.User.find({where: {id: 1}, include: [models.UserRole]});
 }).then(function(admin) {
+    //TODO fix this mess
     if(admin == null) {
-        console.log('WARNING: No admin account exists')
+        if (args.r) {
+            return models.User.create(  {   id: 1, name: 'admin', email: 'admin@admin.com',
+                    userroles: [{userId: 1, roleId: 'sixpackadmin'}],
+                    localprofile: {password: 'admin'}
+                },
+                {
+                    include: [models.UserRole, models.LocalProfile]
+                });
+        } else {
+            console.log('WARNING: No admin account exists')
+        }
+
     } else if (args.r) {
         //Reset the admin account
         return admin.destroy().then(function () {

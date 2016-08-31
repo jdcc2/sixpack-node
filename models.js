@@ -184,12 +184,10 @@ var models = {
         ///These foreign keys are created by the function calls below, but constraints on uniqueness are set here
         userId: {
             type: Sequelize.INTEGER,
-            unique: 'consumptioncomb',
             allowNull: false
         },
         consumableId: {
             type: Sequelize.INTEGER,
-            unique: 'consumptioncomb',
             allowNull: false
         },
         amount: {
