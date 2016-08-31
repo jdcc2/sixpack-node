@@ -5,50 +5,77 @@
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.1.2/css/bulma.min.css">
     <style>
-        body        { padding-top:80px; }
+        .logincontainer {display: flex; flex-direction: column; justify-content: center; align-items: left;
+            min-width: 500px; max-width: 700px; margin: 20px; padding: 20px; background-color: white}
+        .centercontainer {display: flex; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="columns">
-        <div class="column"></div>
-        <div class="column is-two-thirds">
-            <h1><span class="fa fa-sign-in"></span> Login</h1>
+<section class="hero">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">
+                Sixpack
+            </h1>
+            <h2 class="subtitle">
+                Flat administratie
+            </h2>
+        </div>
+    </div>
+</section>
 
-            <!-- LOGIN FORM -->
-            <form action="<%= baseURL%>/auth/login" method="post">
-                <div class="form-group">
-                    <label>Email</label>
-                    <input class="input control" type="text" name="email">
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="input control" name="password">
-                </div>
-                <button type="submit" class="button is-active">Login</button>
-            </form>
+<div class="centercontainer">
+    <% if (error) { %>
+    <div class="notification is-warning">
+        <%= message %>
+    </div>
+    <% } %>
 
-            <% if (gauth) { %>
-                <p>Login with:</p>
+    <!-- LOGIN FORM -->
 
-                <a href="/auth/google/login" class="button is-danger"><i class="fa fa-google-plus"></i> Google Login</a>
+    <form action="<%= baseURL%>/auth/login" method="post">
+        <div class="logincontainer">
+            <h1 class="title"><span class="fa fa-sign-in"></span> Login</h1>
+            <label>Email</label>
+            <input class="input control" type="text" name="email">
+            <label>Password</label>
+            <input type="password" class="input control" name="password">
+            <div>
+                <button type="submit" class="button is-active" style="max-width:100px;">Login</button>
+                <% if (gauth) { %>
 
-                <p>Signup with:</p>
-
-                <a href="/auth/google/signup" class="button is-danger"><i class="fa fa-google-plus"></i> Google Sign-up</a>
-            <% } %>
+                <a href="/auth/google/login" class="button is-danger" ><i class="fa fa-google-plus"></i> Google Login</a>
 
 
-            <% if (error) { %>
-            <div class="notification is-warning">
-                <%= message %>
+                <% } %>
             </div>
-            <% } %>
+
 
         </div>
-        <div class="column"></div>
+    </form>
+    <div class="logincontainer">
+        <% if (gauth) { %>
+
+        <p class="title is-5">Or sign up with:</p>
+        <div>
+            <a href="/auth/google/signup" class="button is-danger"><i class="fa fa-google-plus"></i>Google</a>
+        </div>
+
+        <% } %>
 
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>
