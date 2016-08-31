@@ -10251,25 +10251,40 @@
 	var cachedSetTimeout;
 	var cachedClearTimeout;
 	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
 	(function () {
 	    try {
-	        cachedSetTimeout = setTimeout;
-	    } catch (e) {
-	        cachedSetTimeout = function () {
-	            throw new Error('setTimeout is not defined');
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
 	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
 	    }
 	    try {
-	        cachedClearTimeout = clearTimeout;
-	    } catch (e) {
-	        cachedClearTimeout = function () {
-	            throw new Error('clearTimeout is not defined');
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
 	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
 	    }
 	} ())
 	function runTimeout(fun) {
 	    if (cachedSetTimeout === setTimeout) {
 	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
 	        return setTimeout(fun, 0);
 	    }
 	    try {
@@ -10290,6 +10305,11 @@
 	function runClearTimeout(marker) {
 	    if (cachedClearTimeout === clearTimeout) {
 	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
 	        return clearTimeout(marker);
 	    }
 	    try {
@@ -15677,7 +15697,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-3eaa9182/App.vue"
+	  var id = "./App.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -15726,7 +15746,7 @@
 	
 	    computed: {
 	        logoutURL: function logoutURL() {
-	            return this.url + '/auth/logout';
+	            return '/auth/logout';
 	        }
 	    },
 	    store: _store2.default
@@ -15765,7 +15785,7 @@
 	    beeradmin: false,
 	    config: {
 	        //WARNING: the URL determination works because the webapp is loaded on the root URL of the API server, server side configuration (via javascript global) might be better in certain cases
-	        api_url: window.location.pathname + '/api',
+	        api_url: window.location.pathname + 'api',
 	        url: window.location.pathname
 	        //api_url : 'http://' + window.location.port === "" ?  window.location.hostname : 'http://' + window.location.hostname + ':' + window.location.port
 	    },
@@ -15896,6 +15916,7 @@
 	    var state = _ref2.state;
 	
 	    console.log('fetchcurrentusers');
+	    console.log(state.config.api_url);
 	    (0, _axios2.default)({
 	        method: 'get',
 	        url: state.config.api_url + '/currentuser',
@@ -17661,7 +17682,7 @@
 /* 35 */
 /***/ function(module, exports) {
 
-	module.exports = "\n<div style=\"margin-left: 20px; margin-right: 20px;\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Consumptie manager\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"{{ logoutURL }}\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div style=\"margin-top: 20px\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
+	module.exports = "\n<div style=\"margin-left: 20px; margin-right: 20px;\">\n    <section class=\"hero\">\n        <div class=\"container is-fluid\">\n            <div class=\"hero-body\">\n                <h1 class=\"title\">\n                    Sixpack\n                </h1>\n                <h2 class=\"subtitle\">\n                    Flat administratie\n                </h2>\n            </div>\n        </div>\n    </section>\n    <div class=\"nav\">\n        <div class=\"nav-left\">\n            <span style=\"width: 20px;\"></span>\n            <h1 class=\"title has-text-centered is-brand\">\n                Hello, {{ currentUser != null && currentUser.hasOwnProperty('name') ? currentUser.name : ''}}\n            </h1>\n\n        </div>\n        <div class=\"nav-right nav-menu\">\n            <a class=\"nav-item is-tab\" v-link=\"{path: '/', exact: true}\">Home</a>\n            <a class=\"nav-item is-tab\" v-if=\"admin\" v-link=\"{path: '/admin'}\">Admin</a>\n            <a class=\"nav-item\" href=\"{{ logoutURL }}\">Logout</a>\n            <span></span>\n        </div>\n    </div>\n    <div style=\"margin-top: 20px\">\n        <router-view></router-view>\n    </div>\n\n\n\n\n</div>\n";
 
 /***/ },
 /* 36 */
@@ -17683,7 +17704,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-d906e680/UserManager.vue"
+	  var id = "./UserManager.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -17774,7 +17795,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-d1553dac/UserEditor.vue"
+	  var id = "./UserEditor.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -17918,7 +17939,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-f470b482/UserCreator.vue"
+	  var id = "./UserCreator.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -18009,7 +18030,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-4fe144a4/ConsumptionManager.vue"
+	  var id = "./ConsumptionManager.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -18126,7 +18147,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-41db22af/ConsumablesManager.vue"
+	  var id = "./ConsumablesManager.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -18232,7 +18253,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-afaf1ed2/AdminDashboard.vue"
+	  var id = "./AdminDashboard.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -18297,7 +18318,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-53728413/HomeDashboard.vue"
+	  var id = "./HomeDashboard.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {
@@ -18348,7 +18369,7 @@
 	  var hotAPI = require("vue-hot-reload-api")
 	  hotAPI.install(require("vue"), false)
 	  if (!hotAPI.compatible) return
-	  var id = "_v-3a8cd5eb/UserInfo.vue"
+	  var id = "./UserInfo.vue"
 	  if (!module.hot.data) {
 	    hotAPI.createRecord(id, module.exports)
 	  } else {

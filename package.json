@@ -46,6 +46,8 @@
   },
   "scripts": {
     "startwp": "webpack-dev-server --hot --inline --port 7070",
+    "startdev": "nodemon app.js --ignore webapp/",
+    "wp": "webpack -w --progress",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -7,7 +7,7 @@
                         Sixpack
                     </h1>
                     <h2 class="subtitle">
-                        Consumptie manager
+                        Flat administratie
                     </h2>
                 </div>
             </div>
@@ -58,7 +58,7 @@
         },
         computed: {
             logoutURL: function() {
-                return `${this.url}/auth/logout`;
+                return `/auth/logout`;
             }
         },
         store

@@ -12,8 +12,9 @@ if(config.postgres) {
     });
 }
 
+
+
 module.exports = {
     //Define a storage engine to persist the sqlite database
     sequelize
-
 }
